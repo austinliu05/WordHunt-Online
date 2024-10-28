@@ -35,7 +35,7 @@
   justify-content: center;
   font-weight: bold;
   border-radius: 12px;
-  background-color: #c69f7a; /* Light red by default */
+  background-color: #ff9292; /* Light red by default */
   transition: all 0.3s ease;
   box-shadow: 0 0 10px rgba(255, 77, 77, 0.5); /* Subtle red glow */
 }
@@ -43,7 +43,7 @@
 /* Hover effect with stronger red glow */
 .board-container .col:hover {
   background-color: #faf3ec;
-  box-shadow: 0 0 20px #ca9869, 0 0 30px #ca9869;
+  box-shadow: 0 0 20px #ff9292, 0 0 30px #ff9292;
 }
 
 /* Selected tile with bright red glow */
