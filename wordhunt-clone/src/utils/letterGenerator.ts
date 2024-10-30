@@ -95,5 +95,6 @@ export const generateBoard = (rows: number, cols: number): string[][] => {
         }
         board.push(row);
     }
+    
     return board;
 };
