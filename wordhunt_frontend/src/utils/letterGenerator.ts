@@ -1,3 +1,6 @@
+import { send } from "process";
+import { sendBoard } from "../api/api";
+
 const scrabbleDistribution: { [letter: string]: number } = {
     A: 9, B: 4, C: 4, D: 6, E: 9, F: 4, G: 4,
     H: 4, I: 9, J: 2, K: 4, L: 4, M: 3, N: 6,
@@ -95,6 +98,6 @@ export const generateBoard = (rows: number, cols: number): string[][] => {
         }
         board.push(row);
     }
-    
+    sendBoard({ board: board });
     return board;
 };
