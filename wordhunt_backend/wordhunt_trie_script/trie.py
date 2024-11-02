@@ -5,9 +5,9 @@ class TrieNode:
     """A node in the Trie structure, representing a character in a word."""
 
     def __init__(self):
-        """Initialize the Trie node with an empty children dictionary and an isWord flag."""
+        """Initialize the Trie node with an empty children dictionary and an is_word flag."""
         self.children = {}
-        self.isWord = False
+        self.is_word = False
 
 class Trie:
     """
@@ -31,7 +31,7 @@ class Trie:
             if char not in node.children:
                 node.children[char] = TrieNode()
             node = node.children[char]
-        node.isWord = True
+        node.is_word = True
 
     def search(self, word: str) -> bool:
         """
@@ -48,7 +48,7 @@ class Trie:
             if char not in node.children:
                 return False
             node = node.children[char]
-        return node.isWord
+        return node.is_word
 
     def to_dict(self) -> dict:
         """
@@ -60,7 +60,7 @@ class Trie:
         def node_to_dict(node):
             return {
                 'children': {k: node_to_dict(v) for k, v in node.children.items()},
-                'isWord': node.isWord
+                'is_word': node.is_word
             }
         return node_to_dict(self.root)
 
@@ -78,7 +78,7 @@ class Trie:
         def dict_to_node(data):
             node = TrieNode()
             node.children = {k: dict_to_node(v) for k, v in data['children'].items()}
-            node.isWord = data['isWord']
+            node.is_word = data['is_word']
             return node
 
         trie = Trie()

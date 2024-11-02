@@ -98,6 +98,6 @@ export const generateBoard = (rows: number, cols: number): string[][] => {
         }
         board.push(row);
     }
-    sendBoard({ board: board });
+    sendBoard(board);
     return board;
 };

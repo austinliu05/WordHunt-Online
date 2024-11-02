@@ -5,12 +5,17 @@ const api = axios.create({
     timeout: 10000,
 });
 
-export const sendBoard = async (payload: { board: string[][]; }) => {
+export const sendBoard = async (board: string[][]) => {
     try {
-        const response = await api.post('http://127.0.0.1:8000/get-dictionary', payload, { headers: { 'Content-Type': 'application/json' } });
-        console.log("Sent: board, Returns: Dictionary of possible words")
+        const response = await api.post('http://127.0.0.1:8000/get-dictionary', 
+            { board },
+            { headers: { 'Content-Type': 'application/json' } }
+        );
+
+        console.log("Sent board: ", board, "Returned: ", response.data);
         return response.data;
     } catch (error) {
         console.error(error);
     }
 };
+
