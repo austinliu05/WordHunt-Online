@@ -22,9 +22,16 @@ function App() {
   };
   const timeIsUp = () => {
     setIsGameOver(true);
-  }
+  };
   const trackWords = (newWords: string[]) => {
     setWords(newWords);
+  };
+  const goToStartScreen = () =>{
+    setIsGameStarted(false);
+    setIsGameOver(true);
+  };
+  const goToLeaderboard = () => {
+
   };
   return (
     <div>
@@ -37,7 +44,7 @@ function App() {
           </>
         ) : (
           <>
-          <EndScreen words={words} totalScore={score}/>
+          <EndScreen words={words} totalScore={score} goToStartScreen={goToStartScreen} goToLeaderboard={goToLeaderboard}/>
           </>
         )
       ) : (

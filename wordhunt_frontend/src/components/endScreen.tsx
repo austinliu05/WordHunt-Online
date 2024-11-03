@@ -5,12 +5,14 @@ import { SCORING, MAX_DISPLAYED_WORDS } from '../utils/constants';
 interface EndScreenProps {
     words: string[];
     totalScore: number;
+    goToStartScreen: () => void;
+    goToLeaderboard: () => void;
 }
 
-const EndScreen: React.FC<EndScreenProps> = ({ words, totalScore }) => {
+const EndScreen: React.FC<EndScreenProps> = ({ words, totalScore, goToStartScreen, goToLeaderboard }) => {
     const sortedWordsWithPoints: [string, number][] = words
-        .sort((a, b) => b.length - a.length || b.localeCompare(a)) 
-        .map(word => [word, SCORING[word.length] || 0]); 
+        .sort((a, b) => b.length - a.length || b.localeCompare(a))
+        .map(word => [word, SCORING[word.length] || 0]);
 
     const displayedWords = sortedWordsWithPoints.slice(0, MAX_DISPLAYED_WORDS);
     const remainingWords = sortedWordsWithPoints.length - displayedWords.length;
@@ -45,6 +47,10 @@ const EndScreen: React.FC<EndScreenProps> = ({ words, totalScore }) => {
                     + {remainingWords} more
                 </Button>
             )}
+            <div className="mt-4 d-flex gap-2">
+                <Button variant="primary" onClick={goToStartScreen}>Return to Start</Button>
+                {/* <Button variant="secondary" onClick={goToLeaderboard}>Go to Leaderboard</Button> */}
+            </div>
         </Container>
     );
 };
