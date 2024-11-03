@@ -9,7 +9,7 @@ export const SCORING: { [key: number]: number } = {
 };
 
 // Maximum number of words to display in the EndScreen component
-export const MAX_DISPLAYED_WORDS = 15;
+export const MAX_DISPLAYED_WORDS = 10;
 
 // Number of rows for the board
 export const BOARD_SIZE = 4;
