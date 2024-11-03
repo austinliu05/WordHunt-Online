@@ -1,7 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Row, Col } from 'react-bootstrap';
-import { generateBoard } from '../utils/letterGenerator';
-import { validateWord } from '../utils/validateWord';
+import { generateBoard } from '../../utils/letterGenerator';
+import { validateWord } from '../../utils/validateWord';
+import { SCORING, BOARD_SIZE } from '../../utils/constants';
+
+import './gameBoard.css'
 
 interface Tile {
   row: number;
@@ -12,9 +15,10 @@ interface Tile {
 }
 interface GameBoardProps {
   updateScore: (points: number) => void;
+  trackWords: (words: string[]) => void;
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ updateScore }) => {
+const GameBoard: React.FC<GameBoardProps> = ({ updateScore, trackWords}) => {
   const [board, setBoard] = useState<string[][]>([]);
   const boardContainerRef = useRef<HTMLDivElement>(null);
 
@@ -24,17 +28,17 @@ const GameBoard: React.FC<GameBoardProps> = ({ updateScore }) => {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [usedWords, setUsedWords] = useState<string[]>([]);
 
+  // Generating and setting the 4x4 WordHunt board
   useEffect(() => {
-    setBoard(generateBoard(4, 4));
+    setBoard(generateBoard(BOARD_SIZE, BOARD_SIZE));
   }, []);
-  
+
+  // Prevent scrolling on mobile when dragging is active
   useEffect(() => {
-    // Disable scrolling during touchmove events when dragging is active
     const preventTouchMove = (e: TouchEvent) => {
       if (isDragging) e.preventDefault();
     };
 
-    // Add event listener with { passive: false } to prevent scrolling
     document.addEventListener('touchmove', preventTouchMove, { passive: false });
     return () => document.removeEventListener('touchmove', preventTouchMove);
   }, [isDragging]);
@@ -64,12 +68,13 @@ const GameBoard: React.FC<GameBoardProps> = ({ updateScore }) => {
     setIsDragging(false);
 
     if (currentWord.length > 2 && selectedColor === "green") {
-      const scoring: { [key: number]: number } = { 3: 100, 4: 400, 5: 800, 6: 1400, 7: 1800, 8: 2200 };
-      const points = scoring[currentWord.length] || 0;
+      const points = SCORING[currentWord.length] || 0;
 
       if (!usedWords.includes(currentWord)) {
         setUsedWords((prevWords) => [...prevWords, currentWord]);
         updateScore(points);
+        const newWords = [...usedWords, currentWord];
+        trackWords(newWords);
       }
     }
 
@@ -101,9 +106,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ updateScore }) => {
 
   return (
     <div
-      className="d-flex justify-content-center mt-4"
+      className="d-flex justify-content-center mt-4 m-3"
       onMouseUp={handleEnd}
-      onTouchEnd={handleEnd} // Touch end event
+      onTouchEnd={handleEnd}
     >
       <div
         className="board-container position-relative"

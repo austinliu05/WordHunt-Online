@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { TIMER_LENGTH } from '../utils/constants';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 interface TimerProps {
-    onTimeUp?: () => void; // Optional callback for when time is up
+    onTimeUp?: () => void;
 }
 
 const Timer: React.FC<TimerProps> = ({ onTimeUp }) => {
-    const [time, setTime] = useState(90); 
+    const [time, setTime] = useState(TIMER_LENGTH); 
 
     useEffect(() => {
         if (time <= 0) {
@@ -24,7 +26,7 @@ const Timer: React.FC<TimerProps> = ({ onTimeUp }) => {
     const seconds = time % 60;
 
     return (
-        <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>
+        <div className='d-flex justify-content-center align-items-center display-6 fw-bold mt-3'>
             {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
         </div>
     );
