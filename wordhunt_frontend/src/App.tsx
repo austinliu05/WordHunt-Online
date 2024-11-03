@@ -10,13 +10,16 @@ function App() {
   const startGame = () => {
     setIsGameStarted(true);
   };
+  const updateScore = (points: number) => {
+    setScore((prevScore) => prevScore + points);
+  };
 
   return (
     <div>          
       {isGameStarted ? (
         <>
           <Scoreboard score={score} />
-          <GameBoard />
+          <GameBoard updateScore={updateScore} />
         </>
       ) : (
         <StartScreen onStart={startGame} />

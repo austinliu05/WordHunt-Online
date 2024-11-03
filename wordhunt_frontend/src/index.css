@@ -58,3 +58,11 @@
   pointer-events: none;
   color: #000000; /* White text for contrast */
 }
+
+.board-container .col.selected-green {
+  background-color: rgb(91, 243, 84);
+}
+
+.board-container .col.selected-yellow {
+  background-color: rgb(255, 244, 43);
+}

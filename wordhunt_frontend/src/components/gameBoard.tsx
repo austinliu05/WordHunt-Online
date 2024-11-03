@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { generateBoard } from '../utils/letterGenerator';
+import { validateWord } from '../utils/validateWord';
 
 interface Tile {
   row: number;
@@ -9,7 +10,9 @@ interface Tile {
   x: number;
   y: number;
 }
-
+interface GameBoardProps {
+  updateScore: (points: number) => void;
+}
 /**
  * GameBoard Component
  * 
@@ -18,12 +21,15 @@ interface Tile {
  * lines via an SVG overlay. The component also tracks mouse interactions to 
  * determine which tiles are selected.
  */
-const GameBoard: React.FC = () => {
+const GameBoard: React.FC<GameBoardProps> = ({ updateScore }) => {
   const [board, setBoard] = useState<string[][]>([]);
-  const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-
   const boardContainerRef = useRef<HTMLDivElement>(null); // Reference to the board container
+
+  const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
+  const [currentWord, setCurrentWord] = useState<string>(""); // Track current word
+  const [selectedColor, setSelectedColor] = useState<string | null>();
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [usedWords, setUsedWords] = useState<string[]>([]);
 
   /**
    * useEffect to initialize the board state.
@@ -61,17 +67,30 @@ const GameBoard: React.FC = () => {
     const tileElement = document.getElementById(`tile-${row}-${col}`);
     if (tileElement) {
       const { x, y } = getTileCoordinates(tileElement);
-      setSelectedTiles([{ row, col, letter: board[row][col], x, y }]);
+      const newTile = { row, col, letter: board[row][col], x, y }
+      setSelectedTiles([newTile]);
+      setCurrentWord(board[row][col]);
     }
   };
-
   /**
    * Handles the end of a drag event by logging the selected letters and resetting the state.
    */
   const handleMouseUp = () => {
     setIsDragging(false);
-    console.log('Selected Letters: ', selectedTiles.map((tile) => tile.letter).join(''));
+
+    if (currentWord.length > 2 && selectedColor === "green") {
+      const scoring: { [key: number]: number } = { 3: 100, 4: 400, 5: 800, 6: 1400, 7: 1800, 8: 2200 };
+      const points = scoring[currentWord.length] || 0;
+
+      if (!usedWords.includes(currentWord)) {
+        setUsedWords((prevWords) => [...prevWords, currentWord]);
+        updateScore(points);
+      }
+    }
+
     setSelectedTiles([]);
+    setCurrentWord("");
+    setSelectedColor(null);
   };
 
   /**
@@ -80,15 +99,27 @@ const GameBoard: React.FC = () => {
    * @param {number} row - The row index of the tile.
    * @param {number} col - The column index of the tile.
    */
-  const handleMouseEnter = (row: number, col: number) => {
+  const handleMouseEnter = async (row: number, col: number) => {
     if (isDragging && !isTileSelected(row, col)) {
       const tileElement = document.getElementById(`tile-${row}-${col}`);
       if (tileElement) {
         const { x, y } = getTileCoordinates(tileElement);
+        const newTile = { row, col, letter: board[row][col], x, y };
         setSelectedTiles((prev) => [
           ...prev,
-          { row, col, letter: board[row][col], x, y },
+          newTile,
         ]);
+        const newWord = currentWord + board[row][col];
+        setCurrentWord(newWord);
+
+        const isValid = await validateWord(newWord);
+        const isUsed = usedWords.includes(newWord);
+
+        if (isValid && newWord.length > 2) {
+          setSelectedColor(isUsed ? "yellow" : "green"); // Set color based on usage
+        } else {
+          setSelectedColor(null); // Reset color if invalid or too short
+        }
       }
     }
   };
@@ -113,6 +144,8 @@ const GameBoard: React.FC = () => {
           {selectedTiles.map((tile, index) => {
             if (index === 0) return null; // Skip the first tile (no previous tile to connect)
             const prevTile = selectedTiles[index - 1];
+            const lineColor = selectedColor === "green" || selectedColor === "yellow" ? "rgba(255, 255, 255, 0.6)" : "rgba(255, 0, 0, 0.4)";
+
             return (
               <line
                 key={index}
@@ -120,29 +153,37 @@ const GameBoard: React.FC = () => {
                 y1={prevTile.y}
                 x2={tile.x}
                 y2={tile.y}
-                stroke="rgba(255, 0, 0, 0.4)"
+                stroke={lineColor}
                 strokeWidth="6"
                 strokeLinecap="round"
               />
             );
           })}
         </svg>
-
         {board.map((row, rowIndex) => (
           <Row key={rowIndex} className="mx-0 mb-2">
-            {row.map((letter, colIndex) => (
-              <Col
-                key={colIndex}
-                id={`tile-${rowIndex}-${colIndex}`}
-                className={`border p-3 text-center mx-1 ${
-                  isTileSelected(rowIndex, colIndex) ? 'selected' : ''
-                }`}
-                onMouseDown={() => handleMouseDown(rowIndex, colIndex)}
-                onMouseEnter={() => handleMouseEnter(rowIndex, colIndex)}
-              >
-                <h3>{letter}</h3>
-              </Col>
-            ))}
+            {row.map((letter, colIndex) => {
+              const isSelected = isTileSelected(rowIndex, colIndex);
+              const tileColorClass = isSelected
+                ? selectedColor === "green"
+                  ? "selected-green"
+                  : selectedColor === "yellow"
+                    ? "selected-yellow"
+                    : "selected"
+                : "";
+              console.log(tileColorClass);
+              return (
+                <Col
+                  key={colIndex}
+                  id={`tile-${rowIndex}-${colIndex}`}
+                  className={`border p-3 text-center mx-1 ${tileColorClass}`}
+                  onMouseDown={() => handleMouseDown(rowIndex, colIndex)}
+                  onMouseEnter={() => handleMouseEnter(rowIndex, colIndex)}
+                >
+                  <h3>{letter}</h3>
+                </Col>
+              );
+            })}
           </Row>
         ))}
       </div>
