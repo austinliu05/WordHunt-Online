@@ -5,10 +5,22 @@ import Scoreboard from './components/scoreBoard';
 
 function App() {
   const [score, setScore] = useState(0);
+  const [isGameStarted, setIsGameStarted] = useState(false);
+
+  const startGame = () => {
+    setIsGameStarted(true);
+  };
+
   return (
     <div>          
-      <Scoreboard score={score} />
-      <GameBoard />
+      {isGameStarted ? (
+        <>
+          <Scoreboard score={score} />
+          <GameBoard />
+        </>
+      ) : (
+        <StartScreen onStart={startGame} />
+      )}
     </div>
   );
 }
