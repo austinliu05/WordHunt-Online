@@ -13,39 +13,21 @@ interface Tile {
 interface GameBoardProps {
   updateScore: (points: number) => void;
 }
-/**
- * GameBoard Component
- * 
- * Renders a dynamic 4x4 board of tiles with letters. Users can click and drag
- * across tiles to select a sequence, and the selected tiles are connected with
- * lines via an SVG overlay. The component also tracks mouse interactions to 
- * determine which tiles are selected.
- */
+
 const GameBoard: React.FC<GameBoardProps> = ({ updateScore }) => {
   const [board, setBoard] = useState<string[][]>([]);
-  const boardContainerRef = useRef<HTMLDivElement>(null); // Reference to the board container
+  const boardContainerRef = useRef<HTMLDivElement>(null);
 
   const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
-  const [currentWord, setCurrentWord] = useState<string>(""); // Track current word
+  const [currentWord, setCurrentWord] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string | null>();
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [usedWords, setUsedWords] = useState<string[]>([]);
 
-  /**
-   * useEffect to initialize the board state.
-   * 
-   * Runs only once when the component mounts to generate a 4x4 letter board.
-   */
   useEffect(() => {
     setBoard(generateBoard(4, 4));
   }, []);
 
-  /**
-   * Retrieves the coordinates of a tile relative to the board container.
-   *
-   * @param {HTMLElement} tileElement - The tile DOM element.
-   * @returns {{ x: number, y: number }} - The x and y coordinates of the tile center.
-   */
   const getTileCoordinates = (tileElement: HTMLElement) => {
     const containerRect = boardContainerRef.current?.getBoundingClientRect();
     const tileRect = tileElement.getBoundingClientRect();
@@ -56,26 +38,18 @@ const GameBoard: React.FC<GameBoardProps> = ({ updateScore }) => {
     };
   };
 
-  /**
-   * Handles the start of a drag event by selecting the initial tile.
-   *
-   * @param {number} row - The row index of the tile.
-   * @param {number} col - The column index of the tile.
-   */
-  const handleMouseDown = (row: number, col: number) => {
+  const handleStart = (row: number, col: number) => {
     setIsDragging(true);
     const tileElement = document.getElementById(`tile-${row}-${col}`);
     if (tileElement) {
       const { x, y } = getTileCoordinates(tileElement);
-      const newTile = { row, col, letter: board[row][col], x, y }
+      const newTile = { row, col, letter: board[row][col], x, y };
       setSelectedTiles([newTile]);
       setCurrentWord(board[row][col]);
     }
   };
-  /**
-   * Handles the end of a drag event by logging the selected letters and resetting the state.
-   */
-  const handleMouseUp = () => {
+
+  const handleEnd = () => {
     setIsDragging(false);
 
     if (currentWord.length > 2 && selectedColor === "green") {
@@ -93,56 +67,40 @@ const GameBoard: React.FC<GameBoardProps> = ({ updateScore }) => {
     setSelectedColor(null);
   };
 
-  /**
-   * Adds a tile to the selected path during a drag event.
-   *
-   * @param {number} row - The row index of the tile.
-   * @param {number} col - The column index of the tile.
-   */
-  const handleMouseEnter = async (row: number, col: number) => {
+  const handleMove = async (row: number, col: number) => {
     if (isDragging && !isTileSelected(row, col)) {
       const tileElement = document.getElementById(`tile-${row}-${col}`);
       if (tileElement) {
         const { x, y } = getTileCoordinates(tileElement);
         const newTile = { row, col, letter: board[row][col], x, y };
-        setSelectedTiles((prev) => [
-          ...prev,
-          newTile,
-        ]);
+        setSelectedTiles((prev) => [...prev, newTile]);
         const newWord = currentWord + board[row][col];
         setCurrentWord(newWord);
 
         const isValid = await validateWord(newWord);
         const isUsed = usedWords.includes(newWord);
 
-        if (isValid && newWord.length > 2) {
-          setSelectedColor(isUsed ? "yellow" : "green"); // Set color based on usage
-        } else {
-          setSelectedColor(null); // Reset color if invalid or too short
-        }
+        setSelectedColor(isValid && newWord.length > 2 ? (isUsed ? "yellow" : "green") : null);
       }
     }
   };
 
-  /**
-   * Checks if a specific tile has already been selected.
-   *
-   * @param {number} row - The row index of the tile.
-   * @param {number} col - The column index of the tile.
-   * @returns {boolean} - True if the tile is already selected, otherwise false.
-   */
   const isTileSelected = (row: number, col: number): boolean =>
     selectedTiles.some((tile) => tile.row === row && tile.col === col);
 
   return (
-    <div className="d-flex justify-content-center mt-4" onMouseUp={handleMouseUp}>
+    <div
+      className="d-flex justify-content-center mt-4"
+      onMouseUp={handleEnd}
+      onTouchEnd={handleEnd} // Touch end event
+    >
       <div
         className="board-container position-relative"
-        ref={boardContainerRef} // Attach ref to the board container
+        ref={boardContainerRef}
       >
         <svg className="line-layer position-absolute w-100 h-100">
           {selectedTiles.map((tile, index) => {
-            if (index === 0) return null; // Skip the first tile (no previous tile to connect)
+            if (index === 0) return null;
             const prevTile = selectedTiles[index - 1];
             const lineColor = selectedColor === "green" || selectedColor === "yellow" ? "rgba(255, 255, 255, 0.6)" : "rgba(255, 0, 0, 0.4)";
 
@@ -171,14 +129,24 @@ const GameBoard: React.FC<GameBoardProps> = ({ updateScore }) => {
                     ? "selected-yellow"
                     : "selected"
                 : "";
-              console.log(tileColorClass);
+
               return (
                 <Col
                   key={colIndex}
                   id={`tile-${rowIndex}-${colIndex}`}
                   className={`border p-3 text-center mx-1 ${tileColorClass}`}
-                  onMouseDown={() => handleMouseDown(rowIndex, colIndex)}
-                  onMouseEnter={() => handleMouseEnter(rowIndex, colIndex)}
+                  onMouseDown={() => handleStart(rowIndex, colIndex)}
+                  onMouseEnter={() => handleMove(rowIndex, colIndex)}
+                  onTouchStart={() => handleStart(rowIndex, colIndex)}
+                  onTouchMove={(e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+                    if (target && target.id.startsWith('tile-')) {
+                      const [_, r, c] = target.id.split('-');
+                      handleMove(parseInt(r), parseInt(c));
+                    }
+                  }}
                 >
                   <h3>{letter}</h3>
                 </Col>
