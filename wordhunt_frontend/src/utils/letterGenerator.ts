@@ -1,9 +1,4 @@
-const scrabbleDistribution: { [letter: string]: number } = {
-    A: 9, B: 4, C: 4, D: 6, E: 9, F: 4, G: 4,
-    H: 4, I: 9, J: 2, K: 4, L: 4, M: 3, N: 6,
-    O: 8, P: 4, Q: 1, R: 6, S: 6, T: 6, U: 4,
-    V: 2, W: 2, X: 1, Y: 2, Z: 2
-};
+import { WORD_DISTRIBUTION } from "./constants";
 
 /**
  * Utility function to create the letter pool based on Scrabble distribution.
@@ -11,7 +6,7 @@ const scrabbleDistribution: { [letter: string]: number } = {
  */
 const createLetterPool = (): string[] => {
     const pool: string[] = [];
-    Object.entries(scrabbleDistribution).forEach(([letter, count]) => {
+    Object.entries(WORD_DISTRIBUTION).forEach(([letter, count]) => {
         for (let i = 0; i < count; i++) {
             pool.push(letter);
         }
@@ -54,46 +49,55 @@ const isValidPlacement = (board: string[][], row: number, col: number, letter: s
     if (checkConsonant(row, col - 1)) consonantCount++;
     if (checkConsonant(row, col + 1)) consonantCount++;
 
-    // If more than two consonant neighbor exists, it's invalid.
+    // If more than two consonant neighbors exist, it's invalid.
     return consonantCount < 2;
 };
 
 /**
  * Generates a 2D board with random letters from the Scrabble letter pool,
  * ensuring no large groups of consonants are formed.
+ * If the board contains fewer than 4 vowels, it regenerates until the condition is met.
  * @param {number} rows - Number of rows.
  * @param {number} cols - Number of columns.
  * @returns {string[][]} - A 2D array representing the board.
  */
 export const generateBoard = (rows: number, cols: number): string[][] => {
-    const board: string[][] = [];
-    const addedLetters: { [key: string]: number } = {};
+    let board: string[][];
+    let vowelsCount: number;
 
-    for (let i = 0; i < rows; i++) {
-        const row: string[] = [];
-        for (let j = 0; j < cols; j++) {
-            let randomLetter: string;
-            let validPlacement = false;
+    do {
+        board = [];
+        vowelsCount = 0;
+        const addedLetters: { [key: string]: number } = {};
 
-            // Keep trying until we get a valid letter placement.
-            do {
-                const randomIndex = Math.floor(Math.random() * letterPool.length);
-                randomLetter = letterPool[randomIndex];
+        for (let i = 0; i < rows; i++) {
+            const row: string[] = [];
+            for (let j = 0; j < cols; j++) {
+                let randomLetter: string;
+                let validPlacement = false;
 
-                const maxReached = addedLetters[randomLetter] && addedLetters[randomLetter] >= 3;
-                validPlacement = !maxReached && isValidPlacement(board, i, j, randomLetter);
-            } while (!validPlacement);
+                // Keep trying until we get a valid letter placement.
+                do {
+                    const randomIndex = Math.floor(Math.random() * letterPool.length);
+                    randomLetter = letterPool[randomIndex];
 
-            // Track the usage of the letter.
-            if (randomLetter in addedLetters) {
-                addedLetters[randomLetter] += 1;
-            } else {
-                addedLetters[randomLetter] = 1;
+                    const maxReached = addedLetters[randomLetter] && addedLetters[randomLetter] >= 3;
+                    validPlacement = !maxReached && isValidPlacement(board, i, j, randomLetter);
+                } while (!validPlacement);
+
+                // Track the usage of the letter.
+                addedLetters[randomLetter] = (addedLetters[randomLetter] || 0) + 1;
+
+                // Track the number of vowels
+                if (!isConsonant(randomLetter)) {
+                    vowelsCount += 1;
+                }
+
+                row.push(randomLetter);
             }
-
-            row.push(randomLetter);
+            board.push(row);
         }
-        board.push(row);
-    }
+    } while (vowelsCount < 4); // Regenerate the board if fewer than 4 vowels
+
     return board;
 };
