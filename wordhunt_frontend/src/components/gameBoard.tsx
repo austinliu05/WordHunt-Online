@@ -27,6 +27,17 @@ const GameBoard: React.FC<GameBoardProps> = ({ updateScore }) => {
   useEffect(() => {
     setBoard(generateBoard(4, 4));
   }, []);
+  
+  useEffect(() => {
+    // Disable scrolling during touchmove events when dragging is active
+    const preventTouchMove = (e: TouchEvent) => {
+      if (isDragging) e.preventDefault();
+    };
+
+    // Add event listener with { passive: false } to prevent scrolling
+    document.addEventListener('touchmove', preventTouchMove, { passive: false });
+    return () => document.removeEventListener('touchmove', preventTouchMove);
+  }, [isDragging]);
 
   const getTileCoordinates = (tileElement: HTMLElement) => {
     const containerRect = boardContainerRef.current?.getBoundingClientRect();
