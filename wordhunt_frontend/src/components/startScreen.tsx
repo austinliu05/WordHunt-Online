@@ -8,8 +8,8 @@ interface StartScreenProps {
 
 const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
     return (
-        <Container className="d-flex flex-column justify-content-center align-items-center vh-100">
-            <h1 className="mb-4">WordHunt Online</h1>
+        <Container className="d-flex flex-column justify-content-center align-items-center vh-80">
+            <h1 className="m-5">WordHunt Online</h1>
             <p className="text-center text-muted mb-4">
                 Connect letters together by dragging your mouse/finger. Make as many words as possible.
             </p>
