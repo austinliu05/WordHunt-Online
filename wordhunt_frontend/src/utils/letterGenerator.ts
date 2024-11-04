@@ -97,7 +97,7 @@ export const generateBoard = (rows: number, cols: number): string[][] => {
             }
             board.push(row);
         }
-    } while (vowelsCount < 4); // Regenerate the board if fewer than 4 vowels
+    } while (vowelsCount < 3); // Regenerate the board if fewer than 3 vowels
 
     return board;
 };

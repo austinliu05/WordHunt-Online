@@ -16,7 +16,7 @@ const Scoreboard: React.FC<ScoreboardProps> = ({ score }) => {
             setScoreIncrement(increment);
             setPreviousScore(score); 
 
-            const timeout = setTimeout(() => setScoreIncrement(null), 1000);
+            const timeout = setTimeout(() => setScoreIncrement(null), 500);
             return () => clearTimeout(timeout);
         }
     }, [score, previousScore]);
