@@ -1,15 +1,12 @@
 import React from 'react';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import { SCORING, MAX_DISPLAYED_WORDS } from '../utils/constants';
+import { useWordContext } from '../context/wordContext';
+import { useGameContext } from '../context/gameContext';
 
-interface EndScreenProps {
-    words: string[];
-    totalScore: number;
-    goToStartScreen: () => void;
-    goToLeaderboard: () => void;
-}
-
-const EndScreen: React.FC<EndScreenProps> = ({ words, totalScore, goToStartScreen, goToLeaderboard }) => {
+const EndScreen: React.FC = () => {
+    const {words, } = useWordContext();
+    const {score, goToStartScreen} = useGameContext();
     const sortedWordsWithPoints: [string, number][] = words
         .sort((a, b) => b.length - a.length || b.localeCompare(a))
         .map(word => [word, SCORING[word.length] || 0]);
@@ -24,7 +21,7 @@ const EndScreen: React.FC<EndScreenProps> = ({ words, totalScore, goToStartScree
         >
             <div className="text-center mb-4 border-bottom border-light pb-2">
                 <h5 className="mb-2 fw-bold">WORDS: {words.length}</h5>
-                <h3 className="text-warning fw-bold">SCORE: {totalScore}</h3>
+                <h3 className="text-warning fw-bold">SCORE: {score}</h3>
             </div>
 
             <div className="word-list w-100">

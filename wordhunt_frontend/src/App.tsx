@@ -5,57 +5,28 @@ import Scoreboard from './components/scoreBoard';
 import Timer from './components/timer';
 import EndScreen from './components/endScreen';
 import Footer from './components/footer';
+import { useGameContext } from './context/gameContext';
+import SplitScreen from './components/splitScreen';
 
 function App() {
-  const [score, setScore] = useState(0);
-  const [isGameStarted, setIsGameStarted] = useState(false);
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [words, setWords] = useState<string[]>([]);
-
-  const startGame = () => {
-    setIsGameStarted(true);
-    setIsGameOver(false);
-    setScore(0);
-    setWords([]);
-  };
-
-  const updateScore = (points: number) => {
-    setScore((prevScore) => prevScore + points);
-  };
-
-  const timeIsUp = () => {
-    setIsGameOver(true);
-  };
-
-  const trackWords = (newWords: string[]) => {
-    setWords(newWords);
-  };
-
-  const goToStartScreen = () => {
-    setIsGameStarted(false);
-    setIsGameOver(true);
-  };
-
-  const goToLeaderboard = () => {
-    // Future leaderboard navigation
-  };
-
+  const {isGameStarted, isGameOver, isSinglePlayer} = useGameContext();
   return (
     <div className="d-flex flex-column min-vh-100">
       <div className="flex-grow-1">
         {isGameStarted ? (
           !isGameOver ? (
             <>
-              <Scoreboard score={score} />
-              <Timer onTimeUp={timeIsUp} />
-              <GameBoard updateScore={updateScore} trackWords={trackWords} goToStartScreen={goToStartScreen} />
+              <Scoreboard />
+              <Timer/>
+              <SplitScreen/>
             </>
           ) : (
-            <EndScreen words={words} totalScore={score} goToStartScreen={goToStartScreen} goToLeaderboard={goToLeaderboard} />
+            <EndScreen/>
           )
         ) : (
-          <StartScreen onStart={startGame} />
+          <StartScreen/>
         )}
+        
       </div>
       <Footer />
     </div>

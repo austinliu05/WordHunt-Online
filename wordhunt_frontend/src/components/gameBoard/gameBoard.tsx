@@ -3,7 +3,8 @@ import { Row, Col, Button } from 'react-bootstrap';
 import { generateBoard } from '../../utils/letterGenerator';
 import { validateWord } from '../../utils/validateWord';
 import { SCORING, BOARD_SIZE } from '../../utils/constants';
-
+import { useGameContext } from '../../context/gameContext';
+import { useWordContext } from '../../context/wordContext';
 import './gameBoard.css'
 
 interface Tile {
@@ -13,21 +14,17 @@ interface Tile {
   x: number;
   y: number;
 }
-interface GameBoardProps {
-  updateScore: (points: number) => void;
-  trackWords: (words: string[]) => void;
-  goToStartScreen: () => void;
-}
 
-const GameBoard: React.FC<GameBoardProps> = ({ updateScore, trackWords, goToStartScreen }) => {
+const GameBoard: React.FC = () => {
   const [board, setBoard] = useState<string[][]>([]);
   const boardContainerRef = useRef<HTMLDivElement>(null);
-
   const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
   const [currentWord, setCurrentWord] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string | null>();
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [usedWords, setUsedWords] = useState<string[]>([]);
+  const {updateScore, goToStartScreen} = useGameContext();
+  const { trackWords } = useWordContext();
 
   // Generating and setting the 4x4 WordHunt board
   useEffect(() => {

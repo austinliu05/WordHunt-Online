@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { TIMER_LENGTH } from '../utils/constants';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useGameContext } from '../context/gameContext';
 
-interface TimerProps {
-    onTimeUp?: () => void;
-}
-
-const Timer: React.FC<TimerProps> = ({ onTimeUp }) => {
+const Timer: React.FC= () => {
+    const {timeIsUp} = useGameContext();
     const [time, setTime] = useState(TIMER_LENGTH); 
 
     useEffect(() => {
         if (time <= 0) {
-            if (onTimeUp) onTimeUp(); 
+            if (timeIsUp) timeIsUp(); 
             return;
         }
 
@@ -20,7 +18,7 @@ const Timer: React.FC<TimerProps> = ({ onTimeUp }) => {
         }, 1000);
 
         return () => clearInterval(timerId);
-    }, [time, onTimeUp]);
+    }, [time, timeIsUp]);
 
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
