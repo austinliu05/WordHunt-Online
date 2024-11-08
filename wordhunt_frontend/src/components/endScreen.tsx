@@ -20,15 +20,13 @@ const EndScreen: React.FC<EndScreenProps> = ({ words, totalScore, goToStartScree
     return (
         <Container
             className="d-flex flex-column align-items-center text-light mt-5 mb-5 p-4 bg-dark rounded shadow"
-            style={{ maxWidth: '350px' }} // using this just for setting a fixed width for demo purposes
+            style={{ maxWidth: '350px' }} 
         >
-            {/* Header Section */}
             <div className="text-center mb-4 border-bottom border-light pb-2">
                 <h5 className="mb-2 fw-bold">WORDS: {words.length}</h5>
                 <h3 className="text-warning fw-bold">SCORE: {totalScore}</h3>
             </div>
 
-            {/* Word List Section */}
             <div className="word-list w-100">
                 {displayedWords.map(([word, score], index) => (
                     <Row key={index} className="align-items-center mb-2">
@@ -45,21 +43,16 @@ const EndScreen: React.FC<EndScreenProps> = ({ words, totalScore, goToStartScree
                 ))}
             </div>
 
-            {/* Show More Words Button */}
             {remainingWords > 0 && (
                 <Button variant="link" className="text-warning mt-3">
                     + {remainingWords} more
                 </Button>
             )}
 
-            {/* Navigation Buttons */}
             <div className="mt-4 d-flex gap-2 w-100 justify-content-center">
                 <Button variant="primary" onClick={goToStartScreen} className="fw-bold">
                     Return to Start
                 </Button>
-                {/* <Button variant="secondary" onClick={goToLeaderboard} className="fw-bold">
-                    Go to Leaderboard
-                </Button> */}
             </div>
         </Container>
     );

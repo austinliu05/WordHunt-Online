@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import { generateBoard } from '../../utils/letterGenerator';
 import { validateWord } from '../../utils/validateWord';
 import { SCORING, BOARD_SIZE } from '../../utils/constants';
@@ -16,9 +16,10 @@ interface Tile {
 interface GameBoardProps {
   updateScore: (points: number) => void;
   trackWords: (words: string[]) => void;
+  goToStartScreen: () => void;
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ updateScore, trackWords}) => {
+const GameBoard: React.FC<GameBoardProps> = ({ updateScore, trackWords, goToStartScreen }) => {
   const [board, setBoard] = useState<string[][]>([]);
   const boardContainerRef = useRef<HTMLDivElement>(null);
 
@@ -106,7 +107,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ updateScore, trackWords}) => {
 
   return (
     <div
-      className="d-flex justify-content-center mt-4 m-3"
+      className="d-flex flex-column justify-content-center mt-4 m-3"
       onMouseUp={handleEnd}
       onTouchEnd={handleEnd}
     >
@@ -170,6 +171,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ updateScore, trackWords}) => {
             })}
           </Row>
         ))}
+      </div>
+      <div className='d-flex justify-content-center'>
+        <Button className='m-3 mt-4' variant="danger" size="lg" onClick={goToStartScreen}>
+          End Game
+        </Button>
       </div>
     </div>
   );

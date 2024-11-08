@@ -19,14 +19,18 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
                     <img
                         src={tutorialImage}
                         alt="Tutorial"
-                        className="img-fluid" 
+                        className="img-fluid"
                     />
                 </Col>
             </Row>
-
-            <Button variant="primary" size="lg" onClick={onStart}>
-                Start Game
-            </Button>
+            <div className='d-flex'>
+                <Button className='m-2' variant="primary" size="lg" onClick={onStart}>
+                    Singleplayer
+                </Button>
+                <Button className='m-2' variant="primary" size="lg">
+                    Multiplayer
+                </Button>
+            </div>
         </Container>
     );
 };

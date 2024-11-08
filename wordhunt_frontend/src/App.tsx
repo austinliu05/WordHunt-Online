@@ -48,7 +48,7 @@ function App() {
             <>
               <Scoreboard score={score} />
               <Timer onTimeUp={timeIsUp} />
-              <GameBoard updateScore={updateScore} trackWords={trackWords} />
+              <GameBoard updateScore={updateScore} trackWords={trackWords} goToStartScreen={goToStartScreen} />
             </>
           ) : (
             <EndScreen words={words} totalScore={score} goToStartScreen={goToStartScreen} goToLeaderboard={goToLeaderboard} />
