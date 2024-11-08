@@ -33,7 +33,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     const [score, setScore] = useState<number>(0);
     const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
     const [isGameOver, setIsGameOver] = useState<boolean>(false);
-    const [isSinglePlayer, setIsSinglePlayer] = useState<boolean>(false);
+    const [isSinglePlayer, setisSinglePlayer] = useState<boolean>(false);
 
     const startGame = () => {
         setIsGameStarted(true);

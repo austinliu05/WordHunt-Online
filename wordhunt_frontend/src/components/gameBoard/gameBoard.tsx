@@ -13,9 +13,12 @@ interface Tile {
   letter: string;
   x: number;
   y: number;
+  isCPU: boolean;
 }
-
-const GameBoard: React.FC = () => {
+interface GameBoardProps {
+  isCPU: boolean;
+}
+const GameBoard: React.FC<GameBoardProps> = ({ isCPU }) => {
   const [board, setBoard] = useState<string[][]>([]);
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
@@ -23,7 +26,8 @@ const GameBoard: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState<string | null>();
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [usedWords, setUsedWords] = useState<string[]>([]);
-  const {updateScore, goToStartScreen} = useGameContext();
+  // Global functions and states
+  const { isSinglePlayer, goToStartScreen, updateScore } = useGameContext();
   const { trackWords } = useWordContext();
 
   // Generating and setting the 4x4 WordHunt board
@@ -56,7 +60,7 @@ const GameBoard: React.FC = () => {
     const tileElement = document.getElementById(`tile-${row}-${col}`);
     if (tileElement) {
       const { x, y } = getTileCoordinates(tileElement);
-      const newTile = { row, col, letter: board[row][col], x, y };
+      const newTile = { row, col, letter: board[row][col], x, y, isCPU };
       setSelectedTiles([newTile]);
       setCurrentWord(board[row][col]);
     }
@@ -86,7 +90,7 @@ const GameBoard: React.FC = () => {
       const tileElement = document.getElementById(`tile-${row}-${col}`);
       if (tileElement) {
         const { x, y } = getTileCoordinates(tileElement);
-        const newTile = { row, col, letter: board[row][col], x, y };
+        const newTile = { row, col, letter: board[row][col], x, y, isCPU};
         setSelectedTiles((prev) => [...prev, newTile]);
         const newWord = currentWord + board[row][col];
         setCurrentWord(newWord);
@@ -149,11 +153,12 @@ const GameBoard: React.FC = () => {
                   key={colIndex}
                   id={`tile-${rowIndex}-${colIndex}`}
                   className={`border p-3 text-center mx-1 ${tileColorClass}`}
+                  disabled={isCPU}
                   onMouseDown={() => handleStart(rowIndex, colIndex)}
                   onMouseEnter={() => handleMove(rowIndex, colIndex)}
                   onTouchStart={() => handleStart(rowIndex, colIndex)}
                   onTouchMove={(e) => {
-                    e.preventDefault();
+                    e.preventDefault(); // Disabling scrolling when dragging
                     const touch = e.touches[0];
                     const target = document.elementFromPoint(touch.clientX, touch.clientY);
                     if (target && target.id.startsWith('tile-')) {
@@ -169,11 +174,17 @@ const GameBoard: React.FC = () => {
           </Row>
         ))}
       </div>
+      {isCPU ? 
       <div className='d-flex justify-content-center'>
-        <Button className='m-3 mt-4' variant="danger" size="lg" onClick={goToStartScreen}>
-          End Game
-        </Button>
-      </div>
+        <h1>Opponent</h1>
+      </div> :
+        <div className='d-flex justify-content-center'>
+          <h1>You</h1>
+          <Button className='m-3 mt-4' variant="danger" size="lg" onClick={goToStartScreen}>
+            End Game
+          </Button>
+        </div>
+      }
     </div>
   );
 };

@@ -7,16 +7,19 @@ interface ScoreIncreaseProps {
 
 const ScoreIncrease: React.FC<ScoreIncreaseProps> = ({ increment }) => {
     const [visible, setVisible] = useState(false);
+    const [animationKey, setAnimationKey] = useState(0);
 
     useEffect(() => {
-        // Show the increment and hide it after 1 second
         setVisible(true);
-        const timeout = setTimeout(() => setVisible(false), 1000); // 1 second duration
+        setAnimationKey((prevKey) => prevKey + 1);
+        const timeout = setTimeout(() => setVisible(false), 1000);
         return () => clearTimeout(timeout);
     }, [increment]);
 
     return (
-        <div className={`score-increase ${visible ? 'fade-in' : 'fade-out'} position-absolute custom-score-position`}>
+        <div 
+            key={animationKey}
+            className={`score-increase ${visible ? 'fade-in' : 'fade-out'} position-absolute custom-score-position`}>
             +{increment}
         </div>
     );

@@ -9,14 +9,15 @@ import { useGameContext } from './context/gameContext';
 import SplitScreen from './components/splitScreen';
 
 function App() {
-  const {isGameStarted, isGameOver, isSinglePlayer} = useGameContext();
+  const {isGameStarted, isGameOver} = useGameContext();
+
   return (
     <div className="d-flex flex-column min-vh-100">
       <div className="flex-grow-1">
         {isGameStarted ? (
           !isGameOver ? (
             <>
-              <Scoreboard />
+              <Scoreboard/>
               <Timer/>
               <SplitScreen/>
             </>
