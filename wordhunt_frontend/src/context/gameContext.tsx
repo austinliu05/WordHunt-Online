@@ -51,12 +51,10 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
     const updateCurrentScore = (points: number) => {
         setCurrentPlayerScore((prevScore) => prevScore + points);
-        console.log("Increase by ", points)
     };
 
     const updateOpponentScore = (points: number) => {
         setOpponentPlayerScore((prevScore) => prevScore + points);
-        console.log("Increase by ", points)
     };
 
     const timeIsUp = () => {
@@ -66,6 +64,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     const goToStartScreen = () => {
         setIsGameStarted(false);
         setIsGameOver(true);
+        setBoard(generateBoard(BOARD_SIZE, BOARD_SIZE));
     };
 
     // Generating and setting the 4x4 WordHunt board

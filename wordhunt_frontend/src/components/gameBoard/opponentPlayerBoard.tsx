@@ -10,9 +10,9 @@ interface GameBoardProps {
 const OpponentPlayerBoard: React.FC<GameBoardProps> = ({ isCPU }) => {
   const { board } = useGameContext();
 
-
   return (
     <div className="d-flex flex-column justify-content-center mt-4 m-3">
+      {/* <TrackingSelectedTiles selectedTiles={selectedTiles}/> */}
       <div className="board-container position-relative">
         {board.map((row, rowIndex) => (
           <Row key={rowIndex} className="mx-0 mb-2">

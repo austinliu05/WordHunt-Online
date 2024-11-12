@@ -4,6 +4,7 @@ import { validateWord } from '../../utils/validateWord';
 import { SCORING } from '../../utils/constants';
 import { useGameContext } from '../../context/gameContext';
 import { useWordContext } from '../../context/wordContext';
+import TrackingSelectedTiles from '../trackingSelectedTiles';
 import './gameBoard.css'
 
 interface Tile {
@@ -15,11 +16,12 @@ interface Tile {
 }
 const CurrentPlayerBoard: React.FC= () => {
   const boardContainerRef = useRef<HTMLDivElement>(null);
-  const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
   const [currentWord, setCurrentWord] = useState<string>("");
+  const [usedWords, setUsedWords] = useState<string[]>([]);
+  const [isValidWord, setIsValidWord] = useState(false);
+  const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
   const [selectedColor, setSelectedColor] = useState<string | null>();
   const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [usedWords, setUsedWords] = useState<string[]>([]);
   // Global functions and states
   const { board, goToStartScreen, updateCurrentScore } = useGameContext();
   const { trackWords } = useWordContext();
@@ -84,6 +86,7 @@ const CurrentPlayerBoard: React.FC= () => {
         setCurrentWord(newWord);
 
         const isValid = await validateWord(newWord);
+        setIsValidWord(isValid);
         const isUsed = usedWords.includes(newWord);
 
         setSelectedColor(isValid && newWord.length > 2 ? (isUsed ? "yellow" : "green") : null);
@@ -100,6 +103,7 @@ const CurrentPlayerBoard: React.FC= () => {
       onMouseUp={handleEnd}
       onTouchEnd={handleEnd}
     >
+      <TrackingSelectedTiles selectedTiles={selectedTiles} usedWords={usedWords} selectedColor={selectedColor || 'white'} isValidWord={isValidWord}/>
       <div
         className="board-container position-relative"
         ref={boardContainerRef}
