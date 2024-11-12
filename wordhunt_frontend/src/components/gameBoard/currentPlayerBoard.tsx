@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
-import { generateBoard } from '../../utils/letterGenerator';
+import { Row, Col } from 'react-bootstrap';
 import { validateWord } from '../../utils/validateWord';
-import { SCORING, BOARD_SIZE } from '../../utils/constants';
+import { SCORING } from '../../utils/constants';
 import { useGameContext } from '../../context/gameContext';
 import { useWordContext } from '../../context/wordContext';
 import './gameBoard.css'
@@ -13,13 +12,8 @@ interface Tile {
   letter: string;
   x: number;
   y: number;
-  isCPU: boolean;
 }
-interface GameBoardProps {
-  isCPU: boolean;
-}
-const GameBoard: React.FC<GameBoardProps> = ({ isCPU }) => {
-  const [board, setBoard] = useState<string[][]>([]);
+const CurrentPlayerBoard: React.FC= () => {
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
   const [currentWord, setCurrentWord] = useState<string>("");
@@ -27,20 +21,14 @@ const GameBoard: React.FC<GameBoardProps> = ({ isCPU }) => {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [usedWords, setUsedWords] = useState<string[]>([]);
   // Global functions and states
-  const { isSinglePlayer, goToStartScreen, updateScore } = useGameContext();
+  const { board, goToStartScreen, updateCurrentScore } = useGameContext();
   const { trackWords } = useWordContext();
-
-  // Generating and setting the 4x4 WordHunt board
-  useEffect(() => {
-    setBoard(generateBoard(BOARD_SIZE, BOARD_SIZE));
-  }, []);
 
   // Prevent scrolling on mobile when dragging is active
   useEffect(() => {
     const preventTouchMove = (e: TouchEvent) => {
       if (isDragging) e.preventDefault();
     };
-
     document.addEventListener('touchmove', preventTouchMove, { passive: false });
     return () => document.removeEventListener('touchmove', preventTouchMove);
   }, [isDragging]);
@@ -60,7 +48,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ isCPU }) => {
     const tileElement = document.getElementById(`tile-${row}-${col}`);
     if (tileElement) {
       const { x, y } = getTileCoordinates(tileElement);
-      const newTile = { row, col, letter: board[row][col], x, y, isCPU };
+      const newTile = { row, col, letter: board[row][col], x, y };
       setSelectedTiles([newTile]);
       setCurrentWord(board[row][col]);
     }
@@ -74,7 +62,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ isCPU }) => {
 
       if (!usedWords.includes(currentWord)) {
         setUsedWords((prevWords) => [...prevWords, currentWord]);
-        updateScore(points);
+        updateCurrentScore(points);
         const newWords = [...usedWords, currentWord];
         trackWords(newWords);
       }
@@ -90,7 +78,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ isCPU }) => {
       const tileElement = document.getElementById(`tile-${row}-${col}`);
       if (tileElement) {
         const { x, y } = getTileCoordinates(tileElement);
-        const newTile = { row, col, letter: board[row][col], x, y, isCPU};
+        const newTile = { row, col, letter: board[row][col], x, y};
         setSelectedTiles((prev) => [...prev, newTile]);
         const newWord = currentWord + board[row][col];
         setCurrentWord(newWord);
@@ -153,7 +141,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ isCPU }) => {
                   key={colIndex}
                   id={`tile-${rowIndex}-${colIndex}`}
                   className={`border p-3 text-center mx-1 ${tileColorClass}`}
-                  disabled={isCPU}
                   onMouseDown={() => handleStart(rowIndex, colIndex)}
                   onMouseEnter={() => handleMove(rowIndex, colIndex)}
                   onTouchStart={() => handleStart(rowIndex, colIndex)}
@@ -174,19 +161,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ isCPU }) => {
           </Row>
         ))}
       </div>
-      {isCPU ? 
-      <div className='d-flex justify-content-center'>
-        <h1>Opponent</h1>
-      </div> :
-        <div className='d-flex justify-content-center'>
+        <div className='d-flex justify-content-center mt-2'>
           <h1>You</h1>
-          <Button className='m-3 mt-4' variant="danger" size="lg" onClick={goToStartScreen}>
-            End Game
-          </Button>
         </div>
-      }
     </div>
   );
 };
 
-export default GameBoard;
+export default CurrentPlayerBoard;

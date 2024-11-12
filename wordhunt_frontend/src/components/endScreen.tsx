@@ -6,7 +6,7 @@ import { useGameContext } from '../context/gameContext';
 
 const EndScreen: React.FC = () => {
     const {words, } = useWordContext();
-    const {score, goToStartScreen} = useGameContext();
+    const {currentPlayerScore, goToStartScreen} = useGameContext();
     const sortedWordsWithPoints: [string, number][] = words
         .sort((a, b) => b.length - a.length || b.localeCompare(a))
         .map(word => [word, SCORING[word.length] || 0]);
@@ -21,7 +21,7 @@ const EndScreen: React.FC = () => {
         >
             <div className="text-center mb-4 border-bottom border-light pb-2">
                 <h5 className="mb-2 fw-bold">WORDS: {words.length}</h5>
-                <h3 className="text-warning fw-bold">SCORE: {score}</h3>
+                <h3 className="text-warning fw-bold">SCORE: {currentPlayerScore}</h3>
             </div>
 
             <div className="word-list w-100">

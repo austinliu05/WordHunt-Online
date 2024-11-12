@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Navbar, Container } from 'react-bootstrap';
 import ScoreIncrease from './scoreIncrease/scoreIncrease';
-import { useGameContext } from '../context/gameContext';
 
-const Scoreboard: React.FC = () => {
-    const {score} = useGameContext();
+interface ScoreboardProps {
+    score: number,
+}
+const Scoreboard: React.FC<ScoreboardProps> = ({score}) => {
     const [previousScore, setPreviousScore] = useState(score);
     const [scoreIncrement, setScoreIncrement] = useState<number | null>(null);
 

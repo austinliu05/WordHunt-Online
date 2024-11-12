@@ -10,15 +10,17 @@ const ScoreIncrease: React.FC<ScoreIncreaseProps> = ({ increment }) => {
     const [animationKey, setAnimationKey] = useState(0);
 
     useEffect(() => {
-        setVisible(true);
         setAnimationKey((prevKey) => prevKey + 1);
-        const timeout = setTimeout(() => setVisible(false), 1000);
+        setVisible(true);
+        
+        const timeout = setTimeout(() => setVisible(false), 500);
+        
         return () => clearTimeout(timeout);
     }, [increment]);
 
     return (
         <div 
-            key={animationKey}
+            key={animationKey} 
             className={`score-increase ${visible ? 'fade-in' : 'fade-out'} position-absolute custom-score-position`}>
             +{increment}
         </div>

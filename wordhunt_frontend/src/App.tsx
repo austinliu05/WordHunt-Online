@@ -1,8 +1,4 @@
-import React, { useState } from 'react';
-import GameBoard from './components/gameBoard/gameBoard';
 import StartScreen from './components/startScreen';
-import Scoreboard from './components/scoreBoard';
-import Timer from './components/timer';
 import EndScreen from './components/endScreen';
 import Footer from './components/footer';
 import { useGameContext } from './context/gameContext';
@@ -17,8 +13,6 @@ function App() {
         {isGameStarted ? (
           !isGameOver ? (
             <>
-              <Scoreboard/>
-              <Timer/>
               <SplitScreen/>
             </>
           ) : (

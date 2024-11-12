@@ -1,24 +1,29 @@
-// src/context/GameContext.tsx
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { generateBoard } from '../utils/letterGenerator';
+import { BOARD_SIZE } from '../utils/constants';
 
 interface GameContextType {
-    score: number;
+    board: string[][];
+    currentPlayerScore: number;
+    opponentPlayerScore: number;
     isGameStarted: boolean;
     isGameOver: boolean;
-    isSinglePlayer: boolean;
     startGame: () => void;
-    updateScore: (points: number) => void;
+    updateCurrentScore: (points: number) => void;
+    updateOpponentScore: (points: number) => void;
     timeIsUp: () => void;
     goToStartScreen: () => void;
 }
 
 const defaultGameContext: GameContextType = {
-    score: 0,
+    board: [[]],
+    currentPlayerScore: 0,
+    opponentPlayerScore: 0,
     isGameStarted: false,
     isGameOver: false,
-    isSinglePlayer: true,
     startGame: () => { },
-    updateScore: () => { },
+    updateCurrentScore: () => { },
+    updateOpponentScore: () => { },
     timeIsUp: () => { },
     goToStartScreen: () => { },
 };
@@ -30,7 +35,9 @@ interface GameProviderProps {
 }
 
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
-    const [score, setScore] = useState<number>(0);
+    const [board, setBoard] = useState<string[][]>([]);
+    const [currentPlayerScore, setCurrentPlayerScore] = useState<number>(0);
+    const [opponentPlayerScore, setOpponentPlayerScore] = useState<number>(0);
     const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
     const [isGameOver, setIsGameOver] = useState<boolean>(false);
     const [isSinglePlayer, setisSinglePlayer] = useState<boolean>(false);
@@ -38,11 +45,18 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     const startGame = () => {
         setIsGameStarted(true);
         setIsGameOver(false);
-        setScore(0);
+        setCurrentPlayerScore(0);
+        setOpponentPlayerScore(0);
     };
 
-    const updateScore = (points: number) => {
-        setScore((prevScore) => prevScore + points);
+    const updateCurrentScore = (points: number) => {
+        setCurrentPlayerScore((prevScore) => prevScore + points);
+        console.log("Increase by ", points)
+    };
+
+    const updateOpponentScore = (points: number) => {
+        setOpponentPlayerScore((prevScore) => prevScore + points);
+        console.log("Increase by ", points)
     };
 
     const timeIsUp = () => {
@@ -54,9 +68,14 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         setIsGameOver(true);
     };
 
+    // Generating and setting the 4x4 WordHunt board
+    useEffect(() => {
+        setBoard(generateBoard(BOARD_SIZE, BOARD_SIZE));
+    }, []);
+
     return (
         <GameContext.Provider
-            value={{ score, isGameStarted, isGameOver, isSinglePlayer, startGame, updateScore, timeIsUp, goToStartScreen }}
+            value={{ currentPlayerScore, board, opponentPlayerScore, isGameStarted, isGameOver, startGame, updateCurrentScore, updateOpponentScore, timeIsUp, goToStartScreen }}
         >
             {children}
         </GameContext.Provider>
