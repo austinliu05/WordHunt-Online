@@ -8,6 +8,7 @@ interface GameContextType {
     opponentPlayerScore: number;
     isGameStarted: boolean;
     isGameOver: boolean;
+    difficulty: string;
     startGame: () => void;
     updateCurrentScore: (points: number) => void;
     updateOpponentScore: (points: number) => void;
@@ -21,6 +22,7 @@ const defaultGameContext: GameContextType = {
     opponentPlayerScore: 0,
     isGameStarted: false,
     isGameOver: false,
+    difficulty: 'easy',
     startGame: () => { },
     updateCurrentScore: () => { },
     updateOpponentScore: () => { },
@@ -40,6 +42,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     const [opponentPlayerScore, setOpponentPlayerScore] = useState<number>(0);
     const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
     const [isGameOver, setIsGameOver] = useState<boolean>(false);
+    const [difficulty, setIsDifficulty] = useState<string>("easy");
     const [isSinglePlayer, setisSinglePlayer] = useState<boolean>(false);
 
     const startGame = () => {
@@ -74,7 +77,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
     return (
         <GameContext.Provider
-            value={{ currentPlayerScore, board, opponentPlayerScore, isGameStarted, isGameOver, startGame, updateCurrentScore, updateOpponentScore, timeIsUp, goToStartScreen }}
+            value={{ currentPlayerScore, board, difficulty, opponentPlayerScore, isGameStarted, isGameOver, startGame, updateCurrentScore, updateOpponentScore, timeIsUp, goToStartScreen }}
         >
             {children}
         </GameContext.Provider>

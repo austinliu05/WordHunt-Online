@@ -3,12 +3,33 @@ import { Row, Col } from 'react-bootstrap';
 import { useGameContext } from '../../context/gameContext';
 import './gameBoard.css';
 
-interface GameBoardProps {
-  isCPU: boolean;
-}
+const cpuOpponentPlayerBoard: React.FC = () => {
+  const { board, difficulty } = useGameContext();
 
-const OpponentPlayerBoard: React.FC<GameBoardProps> = ({ isCPU }) => {
-  const { board } = useGameContext();
+  const requestMove = async (payload: { board: string[][], difficulty: string }) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("Response from backend:", data);
+    } catch (error) {
+      console.error("Error making request: ", error);
+    }
+  };
+
+  useEffect(() => {
+    if (board && difficulty) {
+      requestMove({board, difficulty});
+    }
+  }, [board, difficulty]);
 
   return (
     <div className="d-flex flex-column justify-content-center mt-4 m-3">
@@ -36,4 +57,4 @@ const OpponentPlayerBoard: React.FC<GameBoardProps> = ({ isCPU }) => {
   );
 };
 
-export default OpponentPlayerBoard;
+export default cpuOpponentPlayerBoard;

@@ -25,9 +25,9 @@ const StartScreen: React.FC = () => {
                 <Button className='m-2' variant="primary" size="lg" onClick={startGame}>
                     Singleplayer
                 </Button>
-                <Button className='m-2' variant="primary" size="lg">
+                {/* <Button className='m-2' variant="primary" size="lg">
                     Multiplayer
-                </Button>
+                </Button> */}
             </div>
         </Container>
     );

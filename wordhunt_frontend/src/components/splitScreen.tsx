@@ -2,7 +2,7 @@ import React from 'react';
 import Scoreboard from './scoreBoard';
 import Timer from './timer';
 import CurrentPlayerBoard from './gameBoard/currentPlayerBoard';
-import OpponentPlayerBoard from './gameBoard/opponentPlayerBoard';
+import OpponentPlayerBoard from './gameBoard/cpuOpponentPlayerBoard';
 import { useGameContext } from '../context/gameContext';
 
 const SplitScreen: React.FC = () => {
