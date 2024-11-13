@@ -1,4 +1,4 @@
-const WORD_PRIORITY = 'SCPABTMRDEFGLHINOWVKJQYZXU'
+const WORD_PRIORITY = 'SCPABTMRDEFGLHINOWVKJQYZXU';
 
 const SCORING = {
     3: 100,
@@ -8,3 +8,5 @@ const SCORING = {
     7: 1800,
     8: 2200,
 };
+
+const directions = [[1,0], [0,1], [-1,0], [0,-1], [1,1], [-1,-1], [1,-1], [-1,1]];

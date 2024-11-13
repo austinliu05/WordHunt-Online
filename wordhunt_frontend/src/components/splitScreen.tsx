@@ -2,7 +2,7 @@ import React from 'react';
 import Scoreboard from './scoreBoard';
 import Timer from './timer';
 import CurrentPlayerBoard from './gameBoard/currentPlayerBoard';
-import OpponentPlayerBoard from './gameBoard/cpuOpponentPlayerBoard';
+import CPUOpponentPlayerBoard from './gameBoard/cpuOpponentPlayerBoard';
 import { useGameContext } from '../context/gameContext';
 
 const SplitScreen: React.FC = () => {
@@ -27,7 +27,7 @@ const SplitScreen: React.FC = () => {
                     <div className="border-start h-100" style={{ borderWidth: '2px' }}></div>
                 </div>
                 <div className="col-md-4 d-flex justify-content-center">
-                    <OpponentPlayerBoard isCPU={true} />
+                    <CPUOpponentPlayerBoard />
                 </div>
             </div>
 

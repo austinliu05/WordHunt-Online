@@ -3,10 +3,10 @@ import { Row, Col } from 'react-bootstrap';
 import { useGameContext } from '../../context/gameContext';
 import './gameBoard.css';
 
-const cpuOpponentPlayerBoard: React.FC = () => {
+const CPUOpponentPlayerBoard: React.FC = () => {
   const { board, difficulty } = useGameContext();
 
-  const requestMove = async (payload: { board: string[][], difficulty: string }) => {
+  const requestMoves = async (payload: { board: string[][], difficulty: string }) => {
     try {
       const response = await fetch('http://localhost:3000/api/data', {
         method: 'POST',
@@ -27,7 +27,7 @@ const cpuOpponentPlayerBoard: React.FC = () => {
 
   useEffect(() => {
     if (board && difficulty) {
-      requestMove({board, difficulty});
+      requestMoves({board, difficulty});
     }
   }, [board, difficulty]);
 
@@ -57,4 +57,4 @@ const cpuOpponentPlayerBoard: React.FC = () => {
   );
 };
 
-export default cpuOpponentPlayerBoard;
+export default CPUOpponentPlayerBoard;
