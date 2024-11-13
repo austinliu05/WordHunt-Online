@@ -1,3 +1,5 @@
+const { DIRECTIONS, EASY_LIMITED_PATHS, EASY_LIMITED_DEPTH } = require('./constants');
+const {checkBounds, randomGenerate} = require('./utils')
 /**
  * Main function to handle game logic by combining word search and difficulty-specific pathfinding.
  * @param {Array<Array<string>>} board - 2D array representing the board, with each element being a letter.
@@ -6,7 +8,6 @@
  */
 function processGameBoard(board, difficulty) {
     let paths;
-    let words;
 
     if (difficulty === 'easy') {
         paths = easyFindPaths(board);
@@ -17,25 +18,52 @@ function processGameBoard(board, difficulty) {
     } else {
         throw new Error('Invalid difficulty level');
     }
-    return { paths, words };
+    return paths;
 }
 
 /**
- * Finds paths on the board for the "easy" difficulty level.
+ * Finds paths on the board for the "easy" difficulty level. This is a blind search, a simple DFS that randomly builds possible words.
  * @param {Array<Array<string>>} board - 2D array representing the board.
  * @returns {Array<Array<[number, number]>>} Array of paths, where each path is an array of [x, y] coordinates.
  */
 function easyFindPaths(board) {
-    for (let i = 0; i < board.length; i++){
-        for (let j = 0; j < board.length; j++){
-            words = []
+    let max = board.length;
+    let min = 0;
+    let pathCount = 0;
+    let paths = [];
+    while (pathCount < EASY_LIMITED_PATHS) {
+        let i = randomGenerate(min, max);
+        let j = randomGenerate(min, max);
+        let visited = new Set();
+        let words = new Set();
+        function dfs(x,y,depth,word){
+            if (words.size >= 20) {
+                return;
+            }
+            if (!words.has(word)){
+                console.log(word)
+                words.add(word);
+                paths.push(word);
+                pathCount++;
+            }
+            if (!checkBounds(x,y,max) || visited.has(`${x},${y}`) || depth == 0){
+                return 
+            }
+            visited.add(`${x},${y}`);
+            let newWord = word + board[x][y];
+            for (let i = 0; i < DIRECTIONS.length; i++){
+                const [r,c] = DIRECTIONS[i];
+                dfs(x + r, y + c, depth - 1, newWord);
+            }
+            visited.delete(`${x},${y}`);
         }
+        dfs(i,j,EASY_LIMITED_DEPTH,"")
     }
-    return []; // Placeholder return for paths on "easy" difficulty
+    return paths;
 }
 
 /**
- * Finds paths on the board for the "medium" difficulty level.
+ * Finds paths on the board for the "medium" difficulty level. This is a greedy approach where the CPU takes the optimal decision every time. (e.g. prioritizing vowels, prioritizing common prefixes)
  * @param {Array<Array<string>>} board - 2D array representing the board.
  * @returns {Array<Array<[number, number]>>} Array of paths, where each path is an array of [x, y] coordinates.
  */

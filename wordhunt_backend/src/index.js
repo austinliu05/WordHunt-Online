@@ -15,7 +15,7 @@ app.post('/api/data', (req, res) => {
 
     const result = processGameBoard(board, difficulty);
 
-    res.json({ reply: 'Message received successfully' });
+    res.json({ paths: result });
 });
 
 app.listen(PORT, () => {
