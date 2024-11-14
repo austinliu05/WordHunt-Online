@@ -13,6 +13,14 @@ const Footer: React.FC = () => {
                         </p>
                     </Col>
                 </Row>
+                
+                {/* Version Section */}
+                <Row className="text-center m-3">
+                    <Col>
+                        <p className="mb-0">Version: 1.0.0</p>
+                    </Col>
+                </Row>
+
                 <Row className="text-center m-3">
                     <Col>
                         <p className="mb-0">&copy; 2024 Austin Liu. All rights reserved.</p>
