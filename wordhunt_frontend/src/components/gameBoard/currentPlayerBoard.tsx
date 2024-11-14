@@ -14,6 +14,7 @@ interface Tile {
   x: number;
   y: number;
 }
+
 const CurrentPlayerBoard: React.FC= () => {
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [currentWord, setCurrentWord] = useState<string>("");

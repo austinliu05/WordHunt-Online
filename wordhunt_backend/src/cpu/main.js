@@ -1,5 +1,6 @@
 const { DIRECTIONS, EASY_LIMITED_PATHS, EASY_LIMITED_DEPTH } = require('./constants');
-const {checkBounds, randomGenerate} = require('./utils')
+const {checkBounds, randomGenerate, checkWordOrPrefixInTrie} = require('./utils')
+const trie = require('../../wordhunt_dictionary_script/trie_dictionary/trie_dictionary.json');
 /**
  * Main function to handle game logic by combining word search and difficulty-specific pathfinding.
  * @param {Array<Array<string>>} board - 2D array representing the board, with each element being a letter.
@@ -8,13 +9,14 @@ const {checkBounds, randomGenerate} = require('./utils')
  */
 function processGameBoard(board, difficulty) {
     let paths;
+    const lowerCaseBoard = board.map(row => row.map(cell => cell.toLowerCase()));
 
     if (difficulty === 'easy') {
-        paths = easyFindPaths(board);
+        paths = easyFindPaths(lowerCaseBoard);
     } else if (difficulty === 'medium') {
-        paths = mediumFindPaths(board);
+        paths = mediumFindPaths(lowerCaseBoard);
     } else if (difficulty === 'hard') {
-        paths = hardFindPaths(board);
+        paths = hardFindPaths(lowerCaseBoard);
     } else {
         throw new Error('Invalid difficulty level');
     }
@@ -22,42 +24,50 @@ function processGameBoard(board, difficulty) {
 }
 
 /**
- * Finds paths on the board for the "easy" difficulty level. This is a blind search, a simple DFS that randomly builds possible words.
+ * Finds paths on the board for the "easy" difficulty level. Uses trie to prune search paths.
  * @param {Array<Array<string>>} board - 2D array representing the board.
  * @returns {Array<Array<[number, number]>>} Array of paths, where each path is an array of [x, y] coordinates.
  */
 function easyFindPaths(board) {
-    let max = board.length;
-    let min = 0;
+    const max = board.length;
+    const min = 0;
     let pathCount = 0;
-    let paths = [];
+    let paths = {};
     while (pathCount < EASY_LIMITED_PATHS) {
-        let i = randomGenerate(min, max);
-        let j = randomGenerate(min, max);
-        let visited = new Set();
-        let words = new Set();
-        function dfs(x,y,depth,word){
-            if (words.size >= 20) {
+        const i = randomGenerate(min, max);
+        const j = randomGenerate(min, max);
+        const visited = new Set();
+        const words = new Set();
+
+        function dfs(x, y, depth, word, path) {
+            if (!checkBounds(x, y, max) || visited.has(`${x},${y}`) || depth === 0) {
                 return;
             }
-            if (!words.has(word)){
-                console.log(word)
-                words.add(word);
-                paths.push(word);
+
+            const newWord = word + board[x][y];
+            const { isWord, isPrefix } = checkWordOrPrefixInTrie(newWord, trie);
+
+            if (!isPrefix) {
+                return;
+            }
+
+            if (isWord && !words.has(newWord) && newWord.length > 2) {
+                words.add(newWord);
+                paths[newWord] = [...path, [x,y]];
                 pathCount++;
             }
-            if (!checkBounds(x,y,max) || visited.has(`${x},${y}`) || depth == 0){
-                return 
-            }
+
             visited.add(`${x},${y}`);
-            let newWord = word + board[x][y];
-            for (let i = 0; i < DIRECTIONS.length; i++){
-                const [r,c] = DIRECTIONS[i];
-                dfs(x + r, y + c, depth - 1, newWord);
+            path.push([x, y]);
+            for (let k = 0; k < DIRECTIONS.length; k++) {
+                const [r, c] = DIRECTIONS[k];
+                dfs(x + r, y + c, depth - 1, newWord, path);
             }
+            path.pop();
             visited.delete(`${x},${y}`);
         }
-        dfs(i,j,EASY_LIMITED_DEPTH,"")
+
+        dfs(i, j, EASY_LIMITED_DEPTH, "", []);
     }
     return paths;
 }
