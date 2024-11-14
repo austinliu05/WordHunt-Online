@@ -5,7 +5,9 @@ const { processGameBoard } = require('./cpu/main');
 const app = express();
 const PORT = 3000;
 
-app.use(cors({ origin: 'http://localhost:3001' }));
+app.use(cors({
+    origin: ['http://localhost:3000', 'https://wordhunt-online.vercel.app']
+}));
 app.use(express.json());
 
 app.post('/api/data', (req, res) => {
