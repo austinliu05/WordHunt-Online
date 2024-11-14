@@ -150,7 +150,7 @@ const CurrentPlayerBoard: React.FC= () => {
                   onMouseEnter={() => handleMove(rowIndex, colIndex)}
                   onTouchStart={() => handleStart(rowIndex, colIndex)}
                   onTouchMove={(e) => {
-                    e.preventDefault(); // Disabling scrolling when dragging
+                    // e.preventDefault(); // Disabling scrolling when dragging
                     const touch = e.touches[0];
                     const target = document.elementFromPoint(touch.clientX, touch.clientY);
                     if (target && target.id.startsWith('tile-')) {
@@ -166,7 +166,7 @@ const CurrentPlayerBoard: React.FC= () => {
           </Row>
         ))}
       </div>
-        <div className='d-flex justify-content-center mt-2'>
+        <div className='d-flex justify-content-center m-4'>
           <h1>You</h1>
         </div>
     </div>

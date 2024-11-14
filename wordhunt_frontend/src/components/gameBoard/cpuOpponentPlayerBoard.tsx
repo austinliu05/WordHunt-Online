@@ -3,8 +3,9 @@ import { Row, Col } from 'react-bootstrap';
 import { useGameContext } from '../../context/gameContext';
 import { validateWord } from '../../utils/validateWord';
 import TrackingSelectedTiles from '../trackingSelectedTiles';
-import { SCORING } from '../../utils/constants';
+import { SCORING, TIMER_LENGTH } from '../../utils/constants';
 import './gameBoard.css';
+import { useWordContext } from '../../context/wordContext';
 
 interface Tile {
   row: number;
@@ -31,6 +32,8 @@ const CPUOpponentPlayerBoard: React.FC = () => {
     isGameStarted,
     updateOpponentScore,
   } = useGameContext();
+
+  const { trackCPUWords } = useWordContext();
 
   useEffect(() => {
     if (board && difficulty) {
@@ -80,57 +83,62 @@ const CPUOpponentPlayerBoard: React.FC = () => {
   const randomDelay = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
   const simulatePlayerMoves = async () => {
-    while (!isGameOver) {
-      for (const [word, indices] of Object.entries(words)) {
-        let localCurrentWord = '';
-        setCurrentWord('');
-        setSelectedTiles([]);
-        setSelectedColor('');
+    let usedWords: string[] = [];
+    let isTimeExpired = false;
 
-        for (let i = 0; i < word.length; i++) {
-          const char = word[i];
-          localCurrentWord += char;
-          setCurrentWord(localCurrentWord);
+    const timer = setTimeout(() => {
+      isTimeExpired = true;
+    }, TIMER_LENGTH * 1000);
 
-          const [row, col] = indices[i];
-          const tileElement = document.getElementById(`cpu-tile-${row}-${col}`);
-          if (tileElement) {
-            const { x, y } = getTileCoordinates(tileElement);
-            const newTile = { row, col, letter: board[row][col], x, y };
-            setSelectedTiles((prev) => [...prev, newTile]);
-          }
+    for (const [word, indices] of Object.entries(words)) {
+      if (isTimeExpired) return;
 
-          const isValid = await validateWord(localCurrentWord);
-          setIsValidWord(isValid);
-          const isUsed = usedWords.includes(localCurrentWord);
+      let localCurrentWord = '';
+      setCurrentWord('');
+      setSelectedTiles([]);
+      setSelectedColor('');
 
-          if (isValid && localCurrentWord.length > 2) {
-            const color = isUsed ? 'yellow' : 'green';
-            setSelectedColor(color);
-            await delay(300);
-          } else {
-            setSelectedColor(null);
-          }
-          await delay(randomDelay(1500, 2000));
+      for (let i = 0; i < word.length; i++) {
+        const char = word[i];
+        localCurrentWord += char;
+        setCurrentWord(localCurrentWord);
+
+        const [row, col] = indices[i];
+        const tileElement = document.getElementById(`cpu-tile-${row}-${col}`);
+        if (tileElement) {
+          const { x, y } = getTileCoordinates(tileElement);
+          const newTile = { row, col, letter: board[row][col], x, y };
+          setSelectedTiles((prev) => [...prev, newTile]);
         }
 
-        setUsedWords((prevWords) => [...prevWords, localCurrentWord]);
-        setSelectedTiles([]);
-        setSelectedColor('');
-        await checkWordValue(localCurrentWord);
+        const isValid = await validateWord(localCurrentWord);
+        setIsValidWord(isValid);
+        const isUsed = usedWords.includes(localCurrentWord);
+
+        if (isValid && localCurrentWord.length > 2) {
+          const color = isUsed ? 'yellow' : 'green';
+          setSelectedColor(color);
+          await delay(300);
+        } else {
+          setSelectedColor(null);
+        }
+        await delay(randomDelay(1500, 2000));
+        if (isTimeExpired) return;
       }
+      usedWords.push(localCurrentWord);
+      setUsedWords(usedWords);
+      trackCPUWords(usedWords);
+      setSelectedTiles([]);
+      setSelectedColor('');
+      await checkWordValue(localCurrentWord, isTimeExpired);
     }
   };
 
-  const checkWordValue = async (word: string) => {
-    if (word.length > 2) {
+  const checkWordValue = async (word: string, isTimeExpired: boolean) => {
+    if (word.length > 2 && !usedWords.includes(word) && !isTimeExpired) {
       const points = SCORING[word.length] || 0;
       console.log(`Adding ${points} points for word: ${word}`);
-
-      if (!usedWords.includes(word)) {
-        updateOpponentScore(points);
-        setUsedWords((prevWords) => [...prevWords, word]);
-      }
+      updateOpponentScore(points);
     }
   };
 
@@ -192,7 +200,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
         ))}
       </div>
 
-      <div className="d-flex justify-content-center mt-2">
+      <div className="d-flex justify-content-center m-4">
         <h1>Opponent</h1>
       </div>
     </div>

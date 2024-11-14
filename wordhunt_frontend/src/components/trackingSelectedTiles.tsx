@@ -37,7 +37,7 @@ const TrackingSelectedTiles: React.FC<SelectedTilesProps> = ({ selectedTiles, us
     }, [currentWord, usedWords]);
 
     return (
-        <div className="position-relative m-3" style={{ height: '50px' }}>
+        <div className="position-relative mb-5" style={{ height: '30px' }}>
             {currentWord.length > 0 && (
                 <Alert
                     className="text-center position-absolute start-50 translate-middle-x"
