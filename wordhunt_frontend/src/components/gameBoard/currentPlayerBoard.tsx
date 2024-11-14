@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Row, Col } from 'react-bootstrap';
-import { generateBoard } from '../../utils/letterGenerator';
 import { validateWord } from '../../utils/validateWord';
-import { SCORING, BOARD_SIZE } from '../../utils/constants';
-
+import { SCORING } from '../../utils/constants';
+import { useGameContext } from '../../context/gameContext';
+import { useWordContext } from '../../context/wordContext';
+import TrackingSelectedTiles from '../trackingSelectedTiles';
 import './gameBoard.css'
 
 interface Tile {
@@ -13,32 +14,24 @@ interface Tile {
   x: number;
   y: number;
 }
-interface GameBoardProps {
-  updateScore: (points: number) => void;
-  trackWords: (words: string[]) => void;
-}
 
-const GameBoard: React.FC<GameBoardProps> = ({ updateScore, trackWords}) => {
-  const [board, setBoard] = useState<string[][]>([]);
+const CurrentPlayerBoard: React.FC= () => {
   const boardContainerRef = useRef<HTMLDivElement>(null);
-
-  const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
   const [currentWord, setCurrentWord] = useState<string>("");
+  const [usedWords, setUsedWords] = useState<string[]>([]);
+  const [isValidWord, setIsValidWord] = useState(false);
+  const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
   const [selectedColor, setSelectedColor] = useState<string | null>();
   const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [usedWords, setUsedWords] = useState<string[]>([]);
-
-  // Generating and setting the 4x4 WordHunt board
-  useEffect(() => {
-    setBoard(generateBoard(BOARD_SIZE, BOARD_SIZE));
-  }, []);
+  // Global functions and states
+  const { board, goToStartScreen, updateCurrentScore } = useGameContext();
+  const { trackWords } = useWordContext();
 
   // Prevent scrolling on mobile when dragging is active
   useEffect(() => {
     const preventTouchMove = (e: TouchEvent) => {
       if (isDragging) e.preventDefault();
     };
-
     document.addEventListener('touchmove', preventTouchMove, { passive: false });
     return () => document.removeEventListener('touchmove', preventTouchMove);
   }, [isDragging]);
@@ -72,7 +65,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ updateScore, trackWords}) => {
 
       if (!usedWords.includes(currentWord)) {
         setUsedWords((prevWords) => [...prevWords, currentWord]);
-        updateScore(points);
+        updateCurrentScore(points);
         const newWords = [...usedWords, currentWord];
         trackWords(newWords);
       }
@@ -88,12 +81,13 @@ const GameBoard: React.FC<GameBoardProps> = ({ updateScore, trackWords}) => {
       const tileElement = document.getElementById(`tile-${row}-${col}`);
       if (tileElement) {
         const { x, y } = getTileCoordinates(tileElement);
-        const newTile = { row, col, letter: board[row][col], x, y };
+        const newTile = { row, col, letter: board[row][col], x, y};
         setSelectedTiles((prev) => [...prev, newTile]);
         const newWord = currentWord + board[row][col];
         setCurrentWord(newWord);
 
         const isValid = await validateWord(newWord);
+        setIsValidWord(isValid);
         const isUsed = usedWords.includes(newWord);
 
         setSelectedColor(isValid && newWord.length > 2 ? (isUsed ? "yellow" : "green") : null);
@@ -106,10 +100,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ updateScore, trackWords}) => {
 
   return (
     <div
-      className="d-flex justify-content-center mt-4 m-3"
+      className="d-flex flex-column justify-content-center mt-4 m-3"
       onMouseUp={handleEnd}
       onTouchEnd={handleEnd}
     >
+      <TrackingSelectedTiles selectedTiles={selectedTiles} usedWords={usedWords} selectedColor={selectedColor || 'white'} isValidWord={isValidWord}/>
       <div
         className="board-container position-relative"
         ref={boardContainerRef}
@@ -155,7 +150,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ updateScore, trackWords}) => {
                   onMouseEnter={() => handleMove(rowIndex, colIndex)}
                   onTouchStart={() => handleStart(rowIndex, colIndex)}
                   onTouchMove={(e) => {
-                    e.preventDefault();
+                    // e.preventDefault(); // Disabling scrolling when dragging
                     const touch = e.touches[0];
                     const target = document.elementFromPoint(touch.clientX, touch.clientY);
                     if (target && target.id.startsWith('tile-')) {
@@ -171,8 +166,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ updateScore, trackWords}) => {
           </Row>
         ))}
       </div>
+        <div className='d-flex justify-content-center m-4'>
+          <h1>You</h1>
+        </div>
     </div>
   );
 };
 
-export default GameBoard;
+export default CurrentPlayerBoard;
