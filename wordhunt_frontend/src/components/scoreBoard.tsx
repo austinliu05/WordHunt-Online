@@ -9,12 +9,21 @@ const Scoreboard: React.FC<ScoreboardProps> = ({ score }) => {
     const [displayScore, setDisplayScore] = useState(score);
 
     useEffect(() => {
-        if (score > previousScore) {
-            const increment = score - previousScore;
-            setScoreIncrement(increment);
-            setPreviousScore(score); 
+        if (displayScore < score) {
+            const incrementAmount = Math.ceil((score - displayScore) / 3);
 
-            return;
+            const interval = setInterval(() => {
+                setDisplayScore((prevScore) => {
+                    const newScore = prevScore + incrementAmount;
+                    if (newScore >= score) {
+                        clearInterval(interval);
+                        return score; 
+                    }
+                    return newScore;
+                });
+            }, 50);
+
+            return () => clearInterval(interval);
         }
     }, [score, displayScore]);
 
