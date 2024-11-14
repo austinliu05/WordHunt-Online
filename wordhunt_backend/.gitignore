@@ -4,3 +4,5 @@ node_modules/
 
 wordhunt_dictionary_script/config/firebase_admin_private_key.json
 firebase_admin_private_key.json
+
+.vercel
