@@ -10,6 +10,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
+app.options('/api/data', cors());
 app.post('/api/data', (req, res) => {
     const { board, difficulty } = req.body;
     console.log('Board:', board);
