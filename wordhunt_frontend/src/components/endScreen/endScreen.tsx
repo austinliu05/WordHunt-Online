@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, Container, Row, Col } from 'react-bootstrap';
-import { SCORING, MAX_DISPLAYED_WORDS } from '../utils/constants';
-import { useWordContext } from '../context/wordContext';
-import { useGameContext } from '../context/gameContext';
+import { SCORING, MAX_DISPLAYED_WORDS } from '../../utils/constants';
+import { useWordContext } from '../../context/wordContext';
+import { useGameContext } from '../../context/gameContext';
 
 const EndScreen: React.FC = () => {
     const {words, } = useWordContext();

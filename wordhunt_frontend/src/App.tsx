@@ -1,5 +1,5 @@
 import StartScreen from './components/startScreen';
-import EndScreen from './components/endScreen';
+import EndScreen from './components/endScreen/endScreen';
 import Footer from './components/footer';
 import { useGameContext } from './context/gameContext';
 import SplitScreen from './components/splitScreen';

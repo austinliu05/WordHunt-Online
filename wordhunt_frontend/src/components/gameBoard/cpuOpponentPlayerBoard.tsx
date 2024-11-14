@@ -17,13 +17,20 @@ interface Tile {
 const CPUOpponentPlayerBoard: React.FC = () => {
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [words, setWords] = useState<{ [key: string]: any }>({});
+  const [currentWord, setCurrentWord] = useState<string>('');
   const [usedWords, setUsedWords] = useState<string[]>([]);
   const [isValidWord, setIsValidWord] = useState(false);
   const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
   const [selectedColor, setSelectedColor] = useState<string | null>();
   const requestInProgress = useRef(false);
 
-  const { board, difficulty, isGameOver, isGameStarted, updateOpponentScore } = useGameContext();
+  const {
+    board,
+    difficulty,
+    isGameOver,
+    isGameStarted,
+    updateOpponentScore,
+  } = useGameContext();
 
   useEffect(() => {
     if (board && difficulty) {
@@ -32,16 +39,12 @@ const CPUOpponentPlayerBoard: React.FC = () => {
   }, [board, difficulty]);
 
   useEffect(() => {
-    if (words && Object.keys(words).length > 0 && isGameStarted) {
+    if (words && Object.keys(words).length > 0 && isGameStarted && !isGameOver) {
       simulatePlayerMoves();
     }
-  }, [words])
+  }, [words]);
 
-  // useEffect(() => {
-  //   console.log("Updated selectedTiles:", selectedTiles);
-  // }, [selectedTiles]);
-
-  const requestMoves = async (payload: { board: string[][], difficulty: string }) => {
+  const requestMoves = async (payload: { board: string[][]; difficulty: string }) => {
     if (requestInProgress.current) return;
     requestInProgress.current = true;
     try {
@@ -56,12 +59,13 @@ const CPUOpponentPlayerBoard: React.FC = () => {
         throw new Error(`Request failed with status ${response.status}`);
       }
       const data = await response.json();
-      console.log("Response from backend:", data.paths);
+      console.log('Response from backend:', data.paths);
       setWords(data.paths);
     } catch (error) {
-      console.error("Error making request: ", error);
+      console.error('Error making request: ', error);
     }
   };
+
   const getTileCoordinates = (tileElement: HTMLElement) => {
     const containerRect = boardContainerRef.current?.getBoundingClientRect();
     const tileRect = tileElement.getBoundingClientRect();
@@ -73,70 +77,62 @@ const CPUOpponentPlayerBoard: React.FC = () => {
   };
 
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-  const randomDelay = () => Math.floor(Math.random() * (3000 - 1500 + 1)) + 1500;
+  const randomDelay = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-  const handleStart = (row: number, col: number) => {
-    const tileElement = document.getElementById(`tile-${row}-${col}`);
-    if (tileElement) {
-      const { x, y } = getTileCoordinates(tileElement);
-      const newTile = { row, col, letter: board[row][col], x, y };
-      setSelectedTiles((prev) => [...prev, newTile]);
-    }
-  };
-  const handleMove = async (row: number, col: number, currentWord: string) => {
-    if (isTileSelected(row, col)) {
-      const tileElement = document.getElementById(`tile-${row}-${col}`);
-      if (tileElement) {
-        const { x, y } = getTileCoordinates(tileElement);
-        const newTile = { row, col, letter: board[row][col], x, y};
-        setSelectedTiles((prev) => [...prev, newTile]);
-        const newWord = currentWord + board[row][col];
-
-        const isValid = await validateWord(newWord);
-        setIsValidWord(isValid);
-        const isUsed = usedWords.includes(newWord);
-
-        setSelectedColor(isValid && newWord.length > 2 ? (isUsed ? "yellow" : "green") : null);
-      }
-    }
-  };
   const simulatePlayerMoves = async () => {
     while (!isGameOver) {
-      let currentWord: string;
       for (const [word, indices] of Object.entries(words)) {
-        currentWord = "";
+        let localCurrentWord = '';
+        setCurrentWord('');
         setSelectedTiles([]);
-        setSelectedColor("");
+        setSelectedColor('');
+
         for (let i = 0; i < word.length; i++) {
           const char = word[i];
-          currentWord += char;
+          localCurrentWord += char;
+          setCurrentWord(localCurrentWord);
+
           const [row, col] = indices[i];
-          if (i == 0){
-            handleStart(row, col);
+          const tileElement = document.getElementById(`cpu-tile-${row}-${col}`);
+          if (tileElement) {
+            const { x, y } = getTileCoordinates(tileElement);
+            const newTile = { row, col, letter: board[row][col], x, y };
+            setSelectedTiles((prev) => [...prev, newTile]);
           }
-          handleMove(row, col, currentWord);
-          if (i === word.length - 1){
-            await delay(500);
+
+          const isValid = await validateWord(localCurrentWord);
+          setIsValidWord(isValid);
+          const isUsed = usedWords.includes(localCurrentWord);
+
+          if (isValid && localCurrentWord.length > 2) {
+            const color = isUsed ? 'yellow' : 'green';
+            setSelectedColor(color);
+            await delay(300);
+          } else {
+            setSelectedColor(null);
           }
-          await delay(randomDelay());
+          await delay(randomDelay(1500, 2000));
         }
-        setUsedWords((prevWords) => [...prevWords, currentWord]);
-        await checkWordValue(currentWord);
+
+        setUsedWords((prevWords) => [...prevWords, localCurrentWord]);
+        setSelectedTiles([]);
+        setSelectedColor('');
+        await checkWordValue(localCurrentWord);
       }
     }
   };
 
-  const checkWordValue = async (currentWord: string) => {
-    if (currentWord.length > 2) {
-      const points = SCORING[currentWord.length] || 0;
-      console.log(`Adding ${points} points for word: ${currentWord}`);
+  const checkWordValue = async (word: string) => {
+    if (word.length > 2) {
+      const points = SCORING[word.length] || 0;
+      console.log(`Adding ${points} points for word: ${word}`);
 
-      if (!usedWords.includes(currentWord)) {
+      if (!usedWords.includes(word)) {
         updateOpponentScore(points);
-        const newWords = [...usedWords, currentWord];
+        setUsedWords((prevWords) => [...prevWords, word]);
       }
     }
-  }
+  };
 
   const isTileSelected = (row: number, col: number): boolean =>
     selectedTiles.some((tile) => tile.row === row && tile.col === col);
@@ -144,11 +140,11 @@ const CPUOpponentPlayerBoard: React.FC = () => {
   return (
     <div
       className="d-flex flex-column justify-content-center mt-4 m-3"
-      ref={boardContainerRef}
     >
-      <TrackingSelectedTiles selectedTiles={selectedTiles} usedWords={usedWords} selectedColor={selectedColor || 'white'} isValidWord={isValidWord}/>
+      <TrackingSelectedTiles selectedTiles={selectedTiles} usedWords={usedWords} selectedColor={selectedColor || 'white'} isValidWord={isValidWord} />
       <div
         className="board-container position-relative"
+        ref={boardContainerRef}
       >
         <svg className="line-layer position-absolute w-100 h-100">
           {selectedTiles.map((tile, index) => {
@@ -166,7 +162,6 @@ const CPUOpponentPlayerBoard: React.FC = () => {
                 stroke={lineColor}
                 strokeWidth="6"
                 strokeLinecap="round"
-                
               />
             );
           })}
@@ -186,7 +181,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
               return (
                 <Col
                   key={colIndex}
-                  id={`tile-${rowIndex}-${colIndex}`}
+                  id={`cpu-tile-${rowIndex}-${colIndex}`}
                   className={`border p-3 text-center mx-1 ${tileColorClass}`}
                 >
                   <h3>{letter}</h3>
