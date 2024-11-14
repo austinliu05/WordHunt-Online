@@ -2,9 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { useGameContext } from '../../context/gameContext';
 import { validateWord } from '../../utils/validateWord';
+import TrackingSelectedTiles from '../trackingSelectedTiles';
 import { SCORING } from '../../utils/constants';
 import './gameBoard.css';
-import { increment } from 'firebase/database';
 
 interface Tile {
   row: number;
@@ -16,12 +16,14 @@ interface Tile {
 
 const CPUOpponentPlayerBoard: React.FC = () => {
   const boardContainerRef = useRef<HTMLDivElement>(null);
-  const [usedWords, setUsedWords] = useState<string[]>([]);
   const [words, setWords] = useState<{ [key: string]: any }>({});
+  const [usedWords, setUsedWords] = useState<string[]>([]);
+  const [isValidWord, setIsValidWord] = useState(false);
   const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
-  let selectedColor = "";
+  const [selectedColor, setSelectedColor] = useState<string | null>();
+  const requestInProgress = useRef(false);
 
-  const { board, difficulty, isGameOver, isGameStarted } = useGameContext();
+  const { board, difficulty, isGameOver, isGameStarted, updateOpponentScore } = useGameContext();
 
   useEffect(() => {
     if (board && difficulty) {
@@ -35,11 +37,13 @@ const CPUOpponentPlayerBoard: React.FC = () => {
     }
   }, [words])
 
-  useEffect(() => {
-    console.log("Updated selectedColor:", selectedColor);
-  }, [selectedColor]);
+  // useEffect(() => {
+  //   console.log("Updated selectedTiles:", selectedTiles);
+  // }, [selectedTiles]);
 
   const requestMoves = async (payload: { board: string[][], difficulty: string }) => {
+    if (requestInProgress.current) return;
+    requestInProgress.current = true;
     try {
       const response = await fetch('http://localhost:3000/api/data', {
         method: 'POST',
@@ -69,46 +73,70 @@ const CPUOpponentPlayerBoard: React.FC = () => {
   };
 
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+  const randomDelay = () => Math.floor(Math.random() * (3000 - 1500 + 1)) + 1500;
 
-  const simulatePlayerMoves = async () => {
-    while (!isGameOver) {
+  const handleStart = (row: number, col: number) => {
+    const tileElement = document.getElementById(`tile-${row}-${col}`);
+    if (tileElement) {
+      const { x, y } = getTileCoordinates(tileElement);
+      const newTile = { row, col, letter: board[row][col], x, y };
+      setSelectedTiles((prev) => [...prev, newTile]);
+    }
+  };
+  const handleMove = async (row: number, col: number, currentWord: string) => {
+    if (isTileSelected(row, col)) {
+      const tileElement = document.getElementById(`tile-${row}-${col}`);
+      if (tileElement) {
+        const { x, y } = getTileCoordinates(tileElement);
+        const newTile = { row, col, letter: board[row][col], x, y};
+        setSelectedTiles((prev) => [...prev, newTile]);
+        const newWord = currentWord + board[row][col];
 
-      for (const [word, indices] of Object.entries(words)) {
-        let currentWord = "";
-        setSelectedTiles([]);
-        selectedColor = "";
-        for (let i = 0; i < word.length; i++) {
-          const char = word[i];
-          currentWord += char;
+        const isValid = await validateWord(newWord);
+        setIsValidWord(isValid);
+        const isUsed = usedWords.includes(newWord);
 
-          const [row, col] = indices[i];
-          const tileElement = document.getElementById(`tile-${row}-${col}`);
-          if (tileElement) {
-            const { x, y } = getTileCoordinates(tileElement);
-            const newTile = { row, col, letter: board[row][col], x, y };
-            setSelectedTiles((prev) => [...prev, newTile]);
-          }
-
-          console.log(currentWord, selectedTiles);
-
-          await delay(2000);
-        }
-        const isValid = await validateWord(currentWord);
-        const isUsed = usedWords.includes(currentWord);
-
-        if (isValid && currentWord.length > 2) {
-          const color = isUsed ? "yellow" : "green";
-          selectedColor = color;
-          console.log(`Setting color to ${color}`);
-        } else {
-          selectedColor = '';
-          console.log("Setting color to null");
-        }
-        
-        setUsedWords((prevWords) => [...prevWords, currentWord]);
+        setSelectedColor(isValid && newWord.length > 2 ? (isUsed ? "yellow" : "green") : null);
       }
     }
   };
+  const simulatePlayerMoves = async () => {
+    while (!isGameOver) {
+      let currentWord: string;
+      for (const [word, indices] of Object.entries(words)) {
+        currentWord = "";
+        setSelectedTiles([]);
+        setSelectedColor("");
+        for (let i = 0; i < word.length; i++) {
+          const char = word[i];
+          currentWord += char;
+          const [row, col] = indices[i];
+          if (i == 0){
+            handleStart(row, col);
+          }
+          handleMove(row, col, currentWord);
+          if (i === word.length - 1){
+            await delay(500);
+          }
+          await delay(randomDelay());
+        }
+        setUsedWords((prevWords) => [...prevWords, currentWord]);
+        await checkWordValue(currentWord);
+      }
+    }
+  };
+
+  const checkWordValue = async (currentWord: string) => {
+    if (currentWord.length > 2) {
+      const points = SCORING[currentWord.length] || 0;
+      console.log(`Adding ${points} points for word: ${currentWord}`);
+
+      if (!usedWords.includes(currentWord)) {
+        updateOpponentScore(points);
+        const newWords = [...usedWords, currentWord];
+      }
+    }
+  }
 
   const isTileSelected = (row: number, col: number): boolean =>
     selectedTiles.some((tile) => tile.row === row && tile.col === col);
@@ -118,7 +146,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
       className="d-flex flex-column justify-content-center mt-4 m-3"
       ref={boardContainerRef}
     >
-      {/* <TrackingSelectedTiles selectedTiles={selectedTiles} usedWords={usedWords} selectedColor={selectedColor || 'white'} isValidWord={isValidWord}/> */}
+      <TrackingSelectedTiles selectedTiles={selectedTiles} usedWords={usedWords} selectedColor={selectedColor || 'white'} isValidWord={isValidWord}/>
       <div
         className="board-container position-relative"
       >
@@ -138,6 +166,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
                 stroke={lineColor}
                 strokeWidth="6"
                 strokeLinecap="round"
+                
               />
             );
           })}
