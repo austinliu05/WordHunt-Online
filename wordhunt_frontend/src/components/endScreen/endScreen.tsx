@@ -28,7 +28,7 @@ const EndScreen: React.FC = () => {
     const remainingOpponentWords = opponentWordsWithPoints.length - displayedOpponentWords.length;
 
     return (
-        <Container className="d-flex flex-column align-items-center text-light mt-5 mb-5 p-4 bg-dark rounded shadow">
+        <Container className="d-flex flex-column align-items-center text-light mt-5 mb-5  p-4 bg-dark rounded shadow" style={{ maxWidth: '80vw' }}>
             <Row className="w-100">
                 <Col xs={12} md={6} className="p-3">
                     <div className="text-center mb-4 border-bottom border-light pb-2">
