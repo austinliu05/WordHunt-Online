@@ -1,10 +1,14 @@
 import React from 'react';
+import tutorialImage from '../../assets/images/tutorial.png';
 import { Button, Container, Row, Col } from 'react-bootstrap';
-import tutorialImage from '../assets/images/tutorial.png';
-import { useGameContext } from '../context/gameContext';
+import { useNavigate } from 'react-router-dom';
 
 const StartScreen: React.FC = () => {
-    const {startGame} = useGameContext();
+    const navigate = useNavigate();
+
+    const navigateToDifficulty = () => {
+        navigate('/difficulty');
+    };
     return (
         <Container className="d-flex flex-column justify-content-center align-items-center vh-50 p-3">
             <h1 className="mt-5">WordHunt Online</h1>
@@ -22,7 +26,7 @@ const StartScreen: React.FC = () => {
                 </Col>
             </Row>
             <div className='d-flex'>
-                <Button className='m-2' variant="primary" size="lg" onClick={startGame}>
+                <Button className='m-2' variant="primary" size="lg" onClick={navigateToDifficulty}>
                     Singleplayer
                 </Button>
                 {/* <Button className='m-2' variant="primary" size="lg">

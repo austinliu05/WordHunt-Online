@@ -1,3 +1,9 @@
+export const EASY_DELAY = 1000;
+
+export const MEDIUM_DELAY = 300;
+
+export const HARD_DELAY = 0;
+
 // Scoring values based on word length
 export const SCORING: { [key: number]: number } = {
     3: 100,
@@ -14,7 +20,7 @@ export const MAX_DISPLAYED_WORDS = 10;
 // Number of rows for the board
 export const BOARD_SIZE = 4;
 
-export const TIMER_LENGTH = 90;
+export const TIMER_LENGTH = 10;
 
 export const WORD_DISTRIBUTION: { [letter: string]: number } = {
     A: 9, B: 4, C: 4, D: 6, E: 9, F: 4, G: 4,

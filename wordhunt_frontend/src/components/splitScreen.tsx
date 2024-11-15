@@ -4,9 +4,13 @@ import Timer from './timer';
 import CurrentPlayerBoard from './gameBoard/currentPlayerBoard';
 import CPUOpponentPlayerBoard from './gameBoard/cpuOpponentPlayerBoard';
 import { useGameContext } from '../context/gameContext';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const SplitScreen: React.FC = () => {
-    const {currentPlayerScore, opponentPlayerScore} = useGameContext();
+    const {currentPlayerScore, opponentPlayerScore, isGameOver} = useGameContext();
+
+
     return (
         <div className="container-fluid">
             <div className="row bg-dark py-2">

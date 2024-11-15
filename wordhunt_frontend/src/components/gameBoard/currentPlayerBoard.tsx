@@ -150,7 +150,6 @@ const CurrentPlayerBoard: React.FC= () => {
                   onMouseEnter={() => handleMove(rowIndex, colIndex)}
                   onTouchStart={() => handleStart(rowIndex, colIndex)}
                   onTouchMove={(e) => {
-                    // e.preventDefault(); // Disabling scrolling when dragging
                     const touch = e.touches[0];
                     const target = document.elementFromPoint(touch.clientX, touch.clientY);
                     if (target && target.id.startsWith('tile-')) {

@@ -3,9 +3,9 @@ import { Row, Col } from 'react-bootstrap';
 import { useGameContext } from '../../context/gameContext';
 import { validateWord } from '../../utils/validateWord';
 import TrackingSelectedTiles from '../trackingSelectedTiles';
-import { SCORING, TIMER_LENGTH } from '../../utils/constants';
-import './gameBoard.css';
+import { EASY_DELAY, MEDIUM_DELAY, HARD_DELAY, SCORING, TIMER_LENGTH } from '../../utils/constants';
 import { useWordContext } from '../../context/wordContext';
+import './gameBoard.css';
 
 interface Tile {
   row: number;
@@ -24,6 +24,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
   const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
   const [selectedColor, setSelectedColor] = useState<string | null>();
   const requestInProgress = useRef(false);
+  let cpuDelay = HARD_DELAY;
 
   const {
     board,
@@ -31,8 +32,8 @@ const CPUOpponentPlayerBoard: React.FC = () => {
     isGameOver,
     isGameStarted,
     updateOpponentScore,
+    
   } = useGameContext();
-
   const { trackCPUWords } = useWordContext();
 
   useEffect(() => {
@@ -43,17 +44,22 @@ const CPUOpponentPlayerBoard: React.FC = () => {
 
   useEffect(() => {
     if (words && Object.keys(words).length > 0 && isGameStarted && !isGameOver) {
+      if (difficulty === 'easy'){
+        cpuDelay = EASY_DELAY;
+      }else if(difficulty === 'medium'){
+        cpuDelay = MEDIUM_DELAY;
+      }
       simulatePlayerMoves();
     }
   }, [words]);
-
+  
   const requestMoves = async (payload: { board: string[][]; difficulty: string }) => {
     if (requestInProgress.current) return;
     requestInProgress.current = true;
     try {
-      const apiUrl = process.env.REACT_APP_BACKEND_URL;
+      // const apiUrl = process.env.REACT_APP_BACKEND_URL;
       // DEV purposes only
-      // const apiUrl = 'http://localhost:3000/';
+      const apiUrl = 'http://localhost:3000/';
       const response = await fetch(`${apiUrl}api/data`, {
         method: 'POST',
         headers: {
@@ -83,7 +89,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
   };
 
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-  const randomDelay = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+  const randomDelay = () => Math.floor(Math.random() * ((cpuDelay + 500) - cpuDelay + 1)) + cpuDelay;
 
   const simulatePlayerMoves = async () => {
     let usedWords: string[] = [];
@@ -94,7 +100,9 @@ const CPUOpponentPlayerBoard: React.FC = () => {
     }, TIMER_LENGTH * 1000);
 
     for (const [word, indices] of Object.entries(words)) {
-      if (isTimeExpired) return;
+      if (isTimeExpired) {
+        return;
+      }
 
       let localCurrentWord = '';
       setCurrentWord('');
@@ -125,8 +133,10 @@ const CPUOpponentPlayerBoard: React.FC = () => {
         } else {
           setSelectedColor(null);
         }
-        await delay(randomDelay(1500, 2000));
-        if (isTimeExpired) return;
+        await delay(randomDelay());
+        if (isTimeExpired) {
+          return;
+        }
       }
       usedWords.push(localCurrentWord);
       setUsedWords(usedWords);

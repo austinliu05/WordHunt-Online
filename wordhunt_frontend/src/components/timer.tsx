@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { TIMER_LENGTH } from '../utils/constants';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useGameContext } from '../context/gameContext';
+import { useNavigate } from 'react-router-dom';
 
 const Timer: React.FC= () => {
     const {timeIsUp} = useGameContext();
     const [time, setTime] = useState(TIMER_LENGTH); 
-
+    const navigate = useNavigate();
+    
     useEffect(() => {
         if (time <= 0) {
             if (timeIsUp) timeIsUp(); 
+                navigate('/end');
             return;
         }
 

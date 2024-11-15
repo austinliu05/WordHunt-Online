@@ -3,15 +3,17 @@ import { Button, Container, Row, Col } from 'react-bootstrap';
 import { SCORING, MAX_DISPLAYED_WORDS } from '../../utils/constants';
 import { useWordContext } from '../../context/wordContext';
 import { useGameContext } from '../../context/gameContext';
+import { useNavigate } from 'react-router-dom';
 
 const EndScreen: React.FC = () => {
     const { words: playerWords, cpuWords: opponentWords} = useWordContext();
-    const { currentPlayerScore, opponentPlayerScore, isGameOver, timeIsUp, goToStartScreen} = useGameContext();
+    const { currentPlayerScore, opponentPlayerScore, goToStartScreen} = useGameContext();
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        timeIsUp();
-    }, []);
-
+    const navigateToGame = () => {
+        goToStartScreen();
+        navigate('/');
+    };
     const getSortedWordsWithPoints = (words: string[]) =>
         words
             .sort((a, b) => b.length - a.length || b.localeCompare(a))
@@ -84,7 +86,7 @@ const EndScreen: React.FC = () => {
             </Row>
 
             <div className="mt-4 d-flex gap-2 w-100 justify-content-center">
-                <Button variant="primary" onClick={goToStartScreen} className="fw-bold">
+                <Button variant="primary" onClick={navigateToGame} className="fw-bold">
                     Return to Start
                 </Button>
             </div>
