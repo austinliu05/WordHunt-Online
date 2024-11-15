@@ -8,20 +8,14 @@ const PORT = 3000;
 const allowedOrigins = ['http://localhost:3001', 'https://wordhunt-online.vercel.app'];
 
 app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
+    origin: function (origin, callback) {
+        if (allowedOrigins.includes(origin) || !origin) {
+            callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
         }
     },
     credentials: true,
-    methods: ['GET', 'OPTIONS', 'PATCH', 'DELETE', 'POST', 'PUT'],
-    allowedHeaders: [
-        'X-CSRF-Token', 'X-Requested-With', 'Accept', 'Accept-Version', 
-        'Content-Length', 'Content-MD5', 'Content-Type', 'Date', 'X-Api-Version'
-    ]
 }));
 
 app.use(express.json());

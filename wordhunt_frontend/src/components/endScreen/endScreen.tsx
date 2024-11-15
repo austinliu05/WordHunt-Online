@@ -28,7 +28,6 @@ const EndScreen: React.FC = () => {
     return (
         <Container className="d-flex flex-column align-items-center text-light mt-5 mb-5 p-4 bg-dark rounded shadow">
             <Row className="w-100">
-                {/* Current Player Section */}
                 <Col xs={12} md={6} className="p-3">
                     <div className="text-center mb-4 border-bottom border-light pb-2">
                         <h5 className="mb-2 fw-bold">PLAYER WORDS: {playerWords.length}</h5>
@@ -56,7 +55,6 @@ const EndScreen: React.FC = () => {
                     )}
                 </Col>
 
-                {/* CPU Opponent Section */}
                 <Col xs={12} md={6} className="p-3">
                     <div className="text-center mb-4 border-bottom border-light pb-2">
                         <h5 className="mb-2 fw-bold">CPU WORDS: {opponentWords.length}</h5>
@@ -85,7 +83,6 @@ const EndScreen: React.FC = () => {
                 </Col>
             </Row>
 
-            {/* Return to Start Button */}
             <div className="mt-4 d-flex gap-2 w-100 justify-content-center">
                 <Button variant="primary" onClick={goToStartScreen} className="fw-bold">
                     Return to Start
