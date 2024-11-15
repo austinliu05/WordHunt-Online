@@ -1,9 +1,9 @@
 const express = require('express');
+const serverless = require('serverless-http');
 const { processGameBoard } = require('./cpu/main');
 const allowCors = require('./middleware/cors');
 
 const app = express();
-const PORT = 3000;
 
 const handleGameBoardRequest = async (req, res) => {
     const { board, difficulty } = req.body;
@@ -14,14 +14,20 @@ const handleGameBoardRequest = async (req, res) => {
     res.json({ paths: result });
 };
 
-const testConnection = async(req, res) => {
-    res.json({message: "SUCCESS! GET request made."})
-}
+const testConnection = async (req, res) => {
+    res.json({ message: 'SUCCESS! GET request made.' });
+};
 
 app.use(express.json());
 app.post('/api/data', allowCors(handleGameBoardRequest));
 app.get('/api/data', allowCors(testConnection));
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = 3000;
+    app.listen(PORT, () => {
+        console.log(`Server is running locally on http://localhost:${PORT}`);
+    });
+}
+
+module.exports = app; // For local testing
+module.exports.handler = serverless(app); // For Vercel
