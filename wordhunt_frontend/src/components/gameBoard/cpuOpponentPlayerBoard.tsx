@@ -139,7 +139,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
         if (isValid && localCurrentWord.length > 2) {
           const color = isUsed ? 'yellow' : 'green';
           setSelectedColor(color);
-          await delay(300);
+          await delay(500);
         } else {
           setSelectedColor(null);
         }

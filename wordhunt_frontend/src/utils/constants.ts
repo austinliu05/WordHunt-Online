@@ -1,6 +1,6 @@
-export const EASY_DELAY = 1000;
+export const EASY_DELAY = 1500;
 
-export const MEDIUM_DELAY = 300;
+export const MEDIUM_DELAY = 1000;
 
 export const HARD_DELAY = 0;
 

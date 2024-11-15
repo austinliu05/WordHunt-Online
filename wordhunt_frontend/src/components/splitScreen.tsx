@@ -1,24 +1,45 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Scoreboard from './scoreBoard';
 import Timer from './timer';
 import CurrentPlayerBoard from './gameBoard/currentPlayerBoard';
 import CPUOpponentPlayerBoard from './gameBoard/cpuOpponentPlayerBoard';
 import { useGameContext } from '../context/gameContext';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 
 const SplitScreen: React.FC = () => {
-    const {currentPlayerScore, opponentPlayerScore, isGameOver} = useGameContext();
+    const { currentPlayerScore, opponentPlayerScore } = useGameContext();
+    const navigate = useNavigate();
+    const isPageActive = useRef(true);
 
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                console.log('User is actively in page.');
+                isPageActive.current = true;
+            } else {
+                console.log('User has left the page.');
+                isPageActive.current = false;
+            }
+        };
 
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
+
+    const userLeftPage = () =>{
+        navigate("/")
+    }
     return (
         <div className="container-fluid">
             <div className="row bg-dark py-2">
                 <div className='col-6 text-center'>
-                    <Scoreboard score={currentPlayerScore}/>
+                    <Scoreboard score={currentPlayerScore} />
                 </div>
                 <div className='col-6 text-center'>
-                    <Scoreboard score={opponentPlayerScore}/>
+                    <Scoreboard score={opponentPlayerScore} />
                 </div>
             </div>
             <Timer />
