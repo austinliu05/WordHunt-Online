@@ -7,25 +7,23 @@ const PORT = 3000;
 
 const allowedOrigins = ['http://localhost:3001', 'https://wordhunt-online.vercel.app'];
 
-const allowCors = (req, res, next) => {
-    const origin = req.headers.origin;
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    if (allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader(
-        'Access-Control-Allow-Headers',
-        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-    );
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-    } else {
-        next();
-    }
-};
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'OPTIONS', 'PATCH', 'DELETE', 'POST', 'PUT'],
+    allowedHeaders: [
+        'X-CSRF-Token', 'X-Requested-With', 'Accept', 'Accept-Version', 
+        'Content-Length', 'Content-MD5', 'Content-Type', 'Date', 'X-Api-Version'
+    ]
+}));
 
-app.use(allowCors);
 app.use(express.json());
 
 app.post('/api/data', (req, res) => {
