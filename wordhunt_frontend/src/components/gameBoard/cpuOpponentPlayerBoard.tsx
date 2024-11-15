@@ -58,6 +58,8 @@ const CPUOpponentPlayerBoard: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin':'*',
+          'Access-Control-Allow-Methods':'POST,PATCH,OPTIONS'
         },
         body: JSON.stringify(payload),
       });
