@@ -17,7 +17,7 @@ const Footer: React.FC = () => {
                 {/* Version Section */}
                 <Row className="text-center m-3">
                     <Col>
-                        <p className="mb-0">Version: 1.1.1</p>
+                        <p className="mb-0">Version: 1.1.2</p>
                     </Col>
                 </Row>
 
