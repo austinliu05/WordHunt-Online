@@ -9,7 +9,7 @@ app.use(cors());
 
 // Routes
 app.get('/', (req, res) => {
-    res.send('Welcome to the Wordhunt API! v1.3.0');
+    res.send('Welcome to the Wordhunt API! v1.3.1');
 });
 
 app.post('/api/data', (req, res) => {
@@ -26,7 +26,7 @@ app.get('/api/data', (req, res) => {
 });
 
 if (process.env.NODE_ENV !== 'production') {
-    const PORT = 3000;
+    const PORT = 8000;
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 

@@ -1,4 +1,4 @@
-const { DIRECTIONS, LIMITED_PATHS, EASY_LIMITED_DEPTH, MEDIUM_LIMITED_PATHS } = require('./constants');
+const { DIRECTIONS, LIMITED_PATHS, EASY_LIMITED_DEPTH, MEDIUM_LIMITED_DEPTH } = require('./constants');
 const {checkBounds, randomGenerate, checkWordOrPrefixInTrie} = require('./utils')
 const trie = require('../wordhunt_dictionary_script/trie_dictionary/trie_dictionary.json');
 /**
@@ -12,7 +12,7 @@ function processGameBoard(board, difficulty) {
     const lowerCaseBoard = board.map(row => row.map(cell => cell.toLowerCase()));
 
     if (difficulty === 'easy') {
-        paths = genericFindPaths(lowerCaseBoard);
+        paths = easyFindPaths(lowerCaseBoard);
     } else if (difficulty === 'medium') {
         paths = mediumFindPaths(lowerCaseBoard);
     } else if (difficulty === 'hard') {
@@ -82,7 +82,7 @@ function mediumFindPaths(board) {
     const min = 0;
     let pathCount = 0;
     let paths = {};
-    while (pathCount < EASY_LIMITED_PATHS) {
+    while (pathCount < LIMITED_PATHS) {
         const i = randomGenerate(min, max);
         const j = randomGenerate(min, max);
         const visited = new Set();
@@ -116,7 +116,7 @@ function mediumFindPaths(board) {
             visited.delete(`${x},${y}`);
         }
 
-        dfs(i, j, MEDIUM_LIMITED_PATHS, "", []);
+        dfs(i, j, MEDIUM_LIMITED_DEPTH, "", []);
     }
     return paths;
 }

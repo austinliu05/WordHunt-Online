@@ -16,7 +16,7 @@ const Footer: React.FC = () => {
                 
                 <Row className="text-center m-3">
                     <Col>
-                        <p className="mb-0">Version: 2.0.0</p>
+                        <p className="mb-0">Version: 2.0.1</p>
                     </Col>
                 </Row>
 
