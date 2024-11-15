@@ -1,6 +1,6 @@
 const { DIRECTIONS, EASY_LIMITED_PATHS, EASY_LIMITED_DEPTH } = require('./constants');
 const {checkBounds, randomGenerate, checkWordOrPrefixInTrie} = require('./utils')
-const trie = require('../../wordhunt_dictionary_script/trie_dictionary/trie_dictionary.json');
+const trie = require('../wordhunt_dictionary_script/trie_dictionary/trie_dictionary.json');
 /**
  * Main function to handle game logic by combining word search and difficulty-specific pathfinding.
  * @param {Array<Array<string>>} board - 2D array representing the board, with each element being a letter.
