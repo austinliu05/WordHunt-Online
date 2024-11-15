@@ -11,27 +11,27 @@ const SplitScreen: React.FC = () => {
     const navigate = useNavigate();
     const isPageActive = useRef(true);
 
-    useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible') {
-                console.log('User is actively in page.');
-                isPageActive.current = true;
-            } else {
-                console.log('User has left the page.');
-                isPageActive.current = false;
-            }
-        };
+    // useEffect(() => {
+    //     const handleVisibilityChange = () => {
+    //         if (document.visibilityState === 'visible') {
+    //             console.log('User is actively in page.');
+    //             isPageActive.current = true;
+    //         } else {
+    //             console.log('User has left the page.');
+    //             isPageActive.current = false;
+    //         }
+    //     };
 
-        document.addEventListener('visibilitychange', handleVisibilityChange);
+    //     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-        };
-    }, []);
+    //     return () => {
+    //         document.removeEventListener('visibilitychange', handleVisibilityChange);
+    //     };
+    // }, []);
 
-    const userLeftPage = () =>{
-        navigate("/")
-    }
+    // const userLeftPage = () =>{
+    //     navigate("/")
+    // }
     return (
         <div className="container-fluid">
             <div className="row bg-dark py-2">
