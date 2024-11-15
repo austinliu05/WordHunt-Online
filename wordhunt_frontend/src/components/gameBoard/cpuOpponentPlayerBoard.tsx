@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { useGameContext } from '../../context/gameContext';
+import { useWordContext } from '../../context/wordContext';
+import { useLocation } from 'react-router-dom';
 import { validateWord } from '../../utils/validateWord';
 import TrackingSelectedTiles from '../trackingSelectedTiles';
 import { EASY_DELAY, MEDIUM_DELAY, HARD_DELAY, SCORING, TIMER_LENGTH } from '../../utils/constants';
-import { useWordContext } from '../../context/wordContext';
 import './gameBoard.css';
 
 interface Tile {
@@ -23,7 +24,9 @@ const CPUOpponentPlayerBoard: React.FC = () => {
   const [isValidWord, setIsValidWord] = useState(false);
   const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
   const [selectedColor, setSelectedColor] = useState<string | null>();
+  const location = useLocation();
   const requestInProgress = useRef(false);
+  const isComponentActive = useRef(true);
   let cpuDelay = HARD_DELAY;
 
   const {
@@ -35,6 +38,13 @@ const CPUOpponentPlayerBoard: React.FC = () => {
     
   } = useGameContext();
   const { trackCPUWords } = useWordContext();
+
+  useEffect(() => {
+    isComponentActive.current = location.pathname === '/game';
+    return () => {
+      isComponentActive.current = false;
+    };
+  }, [location]);
 
   useEffect(() => {
     if (board && difficulty) {
@@ -100,7 +110,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
     }, TIMER_LENGTH * 1000);
 
     for (const [word, indices] of Object.entries(words)) {
-      if (isTimeExpired) {
+      if (isTimeExpired || !isComponentActive.current) {
         return;
       }
 
@@ -134,7 +144,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
           setSelectedColor(null);
         }
         await delay(randomDelay());
-        if (isTimeExpired) {
+        if (isTimeExpired || !isComponentActive.current) {
           return;
         }
       }
