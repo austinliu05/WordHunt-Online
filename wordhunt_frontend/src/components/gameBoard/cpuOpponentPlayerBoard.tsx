@@ -166,6 +166,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
       setSelectedColor('');
       await checkWordValue(localCurrentWord, isTimeExpired, isValid);
     }
+    console.log("Used up all the words!")
   };
 
   const checkWordValue = async (word: string, isTimeExpired: boolean, isValid: boolean) => {
