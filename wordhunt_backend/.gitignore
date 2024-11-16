@@ -4,3 +4,4 @@ node_modules/
 .vercel
 
 firebase_admin_private_key.json
+wordhunt_dictionary_script/trie_dictionary/words_dictionary.json
