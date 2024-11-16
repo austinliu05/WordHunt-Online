@@ -1,15 +1,22 @@
 const db = require('./config/firebaseConfig');
 const fs = require('fs');
 
-// Read the JSON file
-const data = JSON.parse(fs.readFileSync('words_dictionary.json', 'utf8'));
+const isValidWord = (word) => {
+    const invalidCharacters = /[.#$[\]]/; 
+    return !invalidCharacters.test(word); 
+};
 
-const entries = Object.entries(data).slice(78620);
-
-const uploadData = async () => {
+const uploadDataFromTxt = async () => {
     try {
-        for (const [word, value] of entries){
-            await db.ref(`/words/${word}`).set(value);
+        const data = fs.readFileSync('words.txt', 'utf8').split('\n');
+        
+        for (let i = 0; i < data.length; i++) {
+            const word = data[i].trim(); // Remove any extra spaces or line breaks
+            if (!isValidWord(word)) {
+                console.log(`Skipped invalid word: ${word}`);
+                continue; 
+            }
+            await db.ref(`/words/${word}`).set(word); 
             console.log(`Uploaded word: ${word}`);
         }
         console.log('All words uploaded successfully!');
@@ -18,4 +25,4 @@ const uploadData = async () => {
     }
 };
 
-uploadData();
+uploadDataFromTxt();

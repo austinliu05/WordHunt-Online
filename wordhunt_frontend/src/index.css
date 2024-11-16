@@ -1,0 +1,8 @@
+.no-hover {
+    pointer-events: none;
+}
+
+.no-hover:hover {
+    text-decoration: none !important;
+    cursor: default !important; 
+}

@@ -71,6 +71,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         setIsGameOver(true);
         setBoard(generateBoard(BOARD_SIZE, BOARD_SIZE));
     };
+
     const setDifficultyLevel = (level: string) =>{
         setDifficulty(level);
     }

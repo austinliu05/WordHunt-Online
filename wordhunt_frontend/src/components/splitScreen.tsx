@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useGameContext } from '../context/gameContext';
 import Scoreboard from './scoreBoard';
 import Timer from './timer';
 import CurrentPlayerBoard from './gameBoard/currentPlayerBoard';
 import CPUOpponentPlayerBoard from './gameBoard/cpuOpponentPlayerBoard';
-import { useGameContext } from '../context/gameContext';
-import { useNavigate } from 'react-router-dom';
+import ReturnHomeButton from './returnHomeButton';
 
 const SplitScreen: React.FC = () => {
     const { currentPlayerScore, opponentPlayerScore } = useGameContext();
@@ -43,10 +44,10 @@ const SplitScreen: React.FC = () => {
                 </div>
             </div>
             <Timer />
-
-            <div className='row mt-3'>
+            <div className='row'>
                 <div className="col-md-6 d-flex justify-content-center">
                     <CurrentPlayerBoard />
+                    {/* <ReturnHomeButton/> */}
                 </div>
                 <div className="col-md-1 d-none d-md-flex align-items-center">
                     <div className="border-start h-100" style={{ borderWidth: '2px' }}></div>

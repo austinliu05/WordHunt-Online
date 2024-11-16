@@ -1,19 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import { SCORING, MAX_DISPLAYED_WORDS } from '../../utils/constants';
 import { useWordContext } from '../../context/wordContext';
 import { useGameContext } from '../../context/gameContext';
-import { useNavigate } from 'react-router-dom';
+import ReturnHomeButton from '../returnHomeButton';
+import WinPopup from './winPopup';
+import LosePopup from './losePopup';
 
 const EndScreen: React.FC = () => {
     const { words: playerWords, cpuWords: opponentWords} = useWordContext();
     const { currentPlayerScore, opponentPlayerScore, goToStartScreen} = useGameContext();
-    const navigate = useNavigate();
+    const [showWinPopup, setShowWinPopup] = useState<boolean>(false);
+    const [showLosePopup, setShowLosePopup] = useState<boolean>(false);
+    useEffect(() => {
+        if (currentPlayerScore > opponentPlayerScore){
+            setShowWinPopup(true);
+            setShowLosePopup(false);
+        }else{
+            setShowWinPopup(false);
+            setShowLosePopup(true);
+        }
+    },[currentPlayerScore, opponentPlayerScore])
 
-    const navigateToGame = () => {
-        goToStartScreen();
-        navigate('/');
-    };
     const getSortedWordsWithPoints = (words: string[]) =>
         words
             .sort((a, b) => b.length - a.length || b.localeCompare(a))
@@ -28,9 +36,11 @@ const EndScreen: React.FC = () => {
     const remainingOpponentWords = opponentWordsWithPoints.length - displayedOpponentWords.length;
 
     return (
-        <Container className="d-flex flex-column align-items-center text-light mt-5 mb-5  p-4 bg-dark rounded shadow" style={{ maxWidth: '80vw' }}>
+        <Container className="d-flex flex-column align-items-center text-light mt-5 mb-5 bg-dark p-4 rounded shadow" style={{ maxWidth: '80vw' }}>
+            {showWinPopup && <WinPopup />}
+            {showLosePopup && <LosePopup />}
             <Row className="w-100">
-                <Col xs={12} md={6} className="p-3">
+                <Col xs={12} md={6} className="p-5">
                     <div className="text-center mb-4 border-bottom border-light pb-2">
                         <h5 className="mb-2 fw-bold">PLAYER WORDS: {playerWords.length}</h5>
                         <h3 className="text-warning fw-bold">PLAYER SCORE: {currentPlayerScore}</h3>
@@ -40,7 +50,7 @@ const EndScreen: React.FC = () => {
                             <Row key={index} className="align-items-center mb-2">
                                 <Col
                                     xs={8}
-                                    className="text-dark bg-warning d-flex justify-content-center align-items-center rounded fw-bold py-2 shadow-sm"
+                                    className="text-dark bg-warning d-flex justify-content-center align-items-center rounded fw-bold"
                                 >
                                     {word.toUpperCase()}
                                 </Col>
@@ -51,13 +61,13 @@ const EndScreen: React.FC = () => {
                         ))}
                     </div>
                     {remainingPlayerWords > 0 && (
-                        <Button variant="link" className="text-warning mt-3">
+                        <Button variant="link" className="text-warning mt-3 no-hover">
                             + {remainingPlayerWords} more
                         </Button>
                     )}
                 </Col>
-
-                <Col xs={12} md={6} className="p-3">
+                
+                <Col xs={12} md={6} className="p-5">
                     <div className="text-center mb-4 border-bottom border-light pb-2">
                         <h5 className="mb-2 fw-bold">CPU WORDS: {opponentWords.length}</h5>
                         <h3 className="text-warning fw-bold">CPU SCORE: {opponentPlayerScore}</h3>
@@ -67,7 +77,7 @@ const EndScreen: React.FC = () => {
                             <Row key={index} className="align-items-center mb-2">
                                 <Col
                                     xs={8}
-                                    className="text-dark bg-warning d-flex justify-content-center align-items-center rounded fw-bold py-2 shadow-sm"
+                                    className="text-dark bg-warning d-flex justify-content-center align-items-center rounded fw-bold"
                                 >
                                     {word.toUpperCase()}
                                 </Col>
@@ -78,17 +88,14 @@ const EndScreen: React.FC = () => {
                         ))}
                     </div>
                     {remainingOpponentWords > 0 && (
-                        <Button variant="link" className="text-warning mt-3">
+                        <Button variant="link" className="text-warning mt-3 no-hover">
                             + {remainingOpponentWords} more
                         </Button>
                     )}
                 </Col>
             </Row>
-
-            <div className="mt-4 d-flex gap-2 w-100 justify-content-center">
-                <Button variant="primary" onClick={navigateToGame} className="fw-bold">
-                    Return to Start
-                </Button>
+            <div className="mt-4 d-flex gap-2 w-75 justify-content-center">
+                <ReturnHomeButton/>
             </div>
         </Container>
     );

@@ -1,8 +1,6 @@
 venv/
 node_modules/
 .env
-
-wordhunt_dictionary_script/config/firebase_admin_private_key.json
-firebase_admin_private_key.json
-
 .vercel
+
+firebase_admin_private_key.json
