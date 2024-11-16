@@ -18,7 +18,7 @@ const WinPopup: React.FC = () => {
 
                 <div className="text-center">
                     <h2 className="fw-bold mb-3">Congratulations!</h2>
-                    <p>You have won the game. Great job!</p>
+                    <p>You have won. Great job!</p>
                     <Button variant="light" onClick={handleClose}>
                         Close
                     </Button>

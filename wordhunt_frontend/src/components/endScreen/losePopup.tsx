@@ -18,7 +18,7 @@ const LosePopup: React.FC = () => {
 
                 <div className="text-center">
                     <h2 className="fw-bold mb-3">Oh Noes!</h2>
-                    <p>You have lost the game. Try again next time!</p>
+                    <p>You have lost. Try again next time!</p>
                     <Button variant="light" onClick={handleClose}>
                         Close
                     </Button>
