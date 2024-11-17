@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
-import { EASY_DELAY, MEDIUM_DELAY, HARD_DELAY, SCORING, TIMER_LENGTH } from '../../utils/constants';
+import { EASY_DELAY, MEDIUM_DELAY, SCORING, TIMER_LENGTH } from '../../utils/constants';
 import { useGameContext } from '../../context/gameContext';
 import { useWordContext } from '../../context/wordContext';
 import { validateWord } from '../../utils/validateWord';
@@ -27,7 +27,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
   const location = useLocation();
   const requestInProgress = useRef(false);
   const isComponentActive = useRef(true);
-  let cpuDelay = HARD_DELAY;
+  let cpuDelay = EASY_DELAY;
 
   const {
     board,
@@ -67,9 +67,9 @@ const CPUOpponentPlayerBoard: React.FC = () => {
     if (requestInProgress.current) return;
     requestInProgress.current = true;
     try {
-      const apiUrl = process.env.REACT_APP_BACKEND_URL;
+      let apiUrl = process.env.REACT_APP_BACKEND_URL;
       // DEV purposes only
-      // const apiUrl = 'http://localhost:3000/';
+      apiUrl = 'http://localhost:3000/';
       const response = await fetch(`${apiUrl}api/data`, {
         method: 'POST',
         headers: {
@@ -121,9 +121,9 @@ const CPUOpponentPlayerBoard: React.FC = () => {
 
     for (const [word, indices] of randomizeMoves()) {
       if (isTimeExpired || !isComponentActive.current) {
+        console.log("Time expired")
         return;
       }
-
       let localCurrentWord = '';
       let isValid = false;
       setCurrentWord('');
