@@ -119,7 +119,6 @@ const CPUOpponentPlayerBoard: React.FC = () => {
 
     for (const [word, indices] of randomizeMoves()) {
       if (isTimeExpired || !isComponentActive.current) {
-        console.log("Time expired")
         return;
       }
       let localCurrentWord = '';

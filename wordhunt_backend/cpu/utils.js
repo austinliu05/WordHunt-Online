@@ -46,4 +46,21 @@ function checkWordOrPrefixInTrie(word, trie) {
     };
 }
 
-module.exports = { checkBounds, randomGenerate, checkWordOrPrefixInTrie };
+/**
+ * Validates if a word exists in the Firebase database under the `/words` node.
+ * @param {string} word - The word to validate.
+ * @returns {Promise<boolean>} - Resolves to true if the word exists, false otherwise.
+ */
+const db = require('../wordhunt_dictionary_script/config/firebaseConfig');
+
+const isWordValidInDatabase = async (word) => {
+    try {
+        const snapshot = await db.ref(`/words/${word}`).once('value');
+        return snapshot.exists();
+    } catch (error) {
+        console.error('Error checking word validity:', error);
+        return false;
+    }
+};
+
+module.exports = { checkBounds, randomGenerate, checkWordOrPrefixInTrie, isWordValidInDatabase };

@@ -1,6 +1,6 @@
 const DIRECTIONS = [[1,0], [0,1], [-1,0], [0,-1], [1,1], [-1,-1], [1,-1], [-1,1]];
 
-const LIMITED_PATHS = 200;
+const LIMITED_PATHS = 350;
 
 const EASY_LIMITED_DEPTH = 5;
 
