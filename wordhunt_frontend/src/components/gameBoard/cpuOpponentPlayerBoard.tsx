@@ -67,9 +67,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
     if (requestInProgress.current) return;
     requestInProgress.current = true;
     try {
-      let apiUrl = process.env.REACT_APP_BACKEND_URL;
-      // DEV purposes only
-      // apiUrl = 'http://localhost:3000/';
+      const apiUrl = process.env.REACT_APP_BACKEND_URL;
       const response = await fetch(`${apiUrl}api/data`, {
         method: 'POST',
         headers: {
