@@ -4,6 +4,7 @@ import DifficultySelect from './components/startScreens/difficultySelect';
 import EndScreen from './components/endScreen/endScreen';
 import Footer from './components/footer';
 import SplitScreen from './components/splitScreen';
+import GameLobby from './components/multiplayer/gameLobby';
 import { useGameContext } from './context/gameContext';
 
 const App = () => {
@@ -18,7 +19,8 @@ const App = () => {
             {isGameStarted && !isGameOver && (
               <Route path="/game" element={<SplitScreen />} />
             )}
-            <Route path="difficulty" element={<DifficultySelect/>}/>
+            <Route path="/lobby" element={<GameLobby />}/>
+            <Route path="/difficulty" element={<DifficultySelect/>}/>
             {isGameOver && <Route path="/end" element={<EndScreen />} />}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>

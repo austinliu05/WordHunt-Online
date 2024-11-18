@@ -9,6 +9,9 @@ const StartScreen: React.FC = () => {
     const navigateToDifficulty = () => {
         navigate('/difficulty');
     };
+    const navigateToMultiplayer = () => {
+        navigate('/lobby');
+    };
     return (
         <Container className="d-flex flex-column justify-content-center align-items-center vh-50 p-3">
             <h1 className="mt-5">WordHunt Online</h1>
@@ -29,7 +32,7 @@ const StartScreen: React.FC = () => {
                 <Button className='m-2' variant="primary" size="lg" onClick={navigateToDifficulty}>
                     Singleplayer
                 </Button>
-                <Button className='m-2' variant="primary" size="lg" onClick={}>
+                <Button className='m-2' variant="primary" size="lg" onClick={navigateToMultiplayer}>
                     Multiplayer
                 </Button>
             </div>

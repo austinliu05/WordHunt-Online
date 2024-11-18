@@ -5,7 +5,7 @@ import Scoreboard from './scoreBoard';
 import Timer from './timer';
 import CurrentPlayerBoard from './gameBoard/currentPlayerBoard';
 import CPUOpponentPlayerBoard from './gameBoard/cpuOpponentPlayerBoard';
-import ReturnHomeButton from './returnHomeButton';
+import ReturnHomeButton from './endScreen/returnHomeButton';
 
 const SplitScreen: React.FC = () => {
     const { currentPlayerScore, opponentPlayerScore } = useGameContext();

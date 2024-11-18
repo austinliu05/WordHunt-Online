@@ -3,13 +3,13 @@ import { Button, Container, Row, Col } from 'react-bootstrap';
 import { SCORING, MAX_DISPLAYED_WORDS } from '../../utils/constants';
 import { useWordContext } from '../../context/wordContext';
 import { useGameContext } from '../../context/gameContext';
-import ReturnHomeButton from '../returnHomeButton';
+import ReturnHomeButton from './returnHomeButton';
 import WinPopup from './winPopup';
 import LosePopup from './losePopup';
 
 const EndScreen: React.FC = () => {
     const { words: playerWords, cpuWords: opponentWords} = useWordContext();
-    const { currentPlayerScore, opponentPlayerScore, goToStartScreen} = useGameContext();
+    const { currentPlayerScore, opponentPlayerScore} = useGameContext();
     const [showWinPopup, setShowWinPopup] = useState<boolean>(false);
     const [showLosePopup, setShowLosePopup] = useState<boolean>(false);
     useEffect(() => {

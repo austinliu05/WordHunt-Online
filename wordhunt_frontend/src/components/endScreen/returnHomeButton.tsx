@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { useGameContext } from '../context/gameContext';
+import { useGameContext } from '../../context/gameContext';
 
 const ReturnHomeButton: React.FC = () => {
     const { goToStartScreen } = useGameContext();

@@ -1,13 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { connectSocket, getSocket } from "../../utils/websocket";
 import { useNavigate } from "react-router-dom";
+import { connectSocket, getSocket } from "../../utils/websocket";
+import { useGameContext } from "../../context/gameContext";
 
 const GameLobby = () => {
     const [status, setStatus] = useState<string>("Waiting for another player");
     const [players, setPlayers] = useState<string[]>([]);
     const [room, setRoom] = useState<string | null>(null);
+    const { goToStartScreen } = useGameContext();
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const serverURL = process.env.REACT_APP_BACKEND_URL;
+        const socket = connectSocket(`${serverURL}`);
+
+        socket.emit("joinLobby");
+
+        socket.on("lobbyUpdate", (data: {room: string; players: string[]}) => {
+            setRoom(data.room);
+            setPlayers(data.players);
+
+            if(data.players.length === 2){
+                setStatus("Player found! Starting game...");
+                setTimeout(() => navigate(`/game/${data.room}`), 3000);
+            }
+        });
+
+        return () =>{
+            socket.off("lobbyUpdate")
+        };
+    }, [navigate])
+
+    const goBack = () =>{
+        navigate('/');
+        goToStartScreen();
+    }
     return (
         <div className="container text-center mt-5">
             <div className="row justify-content-center">
@@ -38,7 +65,7 @@ const GameLobby = () => {
 
                         <button
                             className="btn btn-danger mt-3"
-                            onClick={() => navigate("/")}
+                            onClick={goBack}
                         >
                             Cancel
                         </button>
