@@ -1,27 +1,53 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useGameContext } from '../context/gameContext';
 import Scoreboard from './scoreBoard';
 import Timer from './timer';
 import CurrentPlayerBoard from './gameBoard/currentPlayerBoard';
 import CPUOpponentPlayerBoard from './gameBoard/cpuOpponentPlayerBoard';
-import { useGameContext } from '../context/gameContext';
+import ReturnHomeButton from './returnHomeButton';
 
 const SplitScreen: React.FC = () => {
-    const {currentPlayerScore, opponentPlayerScore} = useGameContext();
+    const { currentPlayerScore, opponentPlayerScore } = useGameContext();
+    const navigate = useNavigate();
+    const isPageActive = useRef(true);
+
+    // useEffect(() => {
+    //     const handleVisibilityChange = () => {
+    //         if (document.visibilityState === 'visible') {
+    //             console.log('User is actively in page.');
+    //             isPageActive.current = true;
+    //         } else {
+    //             console.log('User has left the page.');
+    //             isPageActive.current = false;
+    //         }
+    //     };
+
+    //     document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    //     return () => {
+    //         document.removeEventListener('visibilitychange', handleVisibilityChange);
+    //     };
+    // }, []);
+
+    // const userLeftPage = () =>{
+    //     navigate("/")
+    // }
     return (
         <div className="container-fluid">
             <div className="row bg-dark py-2">
                 <div className='col-6 text-center'>
-                    <Scoreboard score={currentPlayerScore}/>
+                    <Scoreboard score={currentPlayerScore} />
                 </div>
                 <div className='col-6 text-center'>
-                    <Scoreboard score={opponentPlayerScore}/>
+                    <Scoreboard score={opponentPlayerScore} />
                 </div>
             </div>
             <Timer />
-
-            <div className='row mt-3'>
+            <div className='row'>
                 <div className="col-md-6 d-flex justify-content-center">
                     <CurrentPlayerBoard />
+                    {/* <ReturnHomeButton/> */}
                 </div>
                 <div className="col-md-1 d-none d-md-flex align-items-center">
                     <div className="border-start h-100" style={{ borderWidth: '2px' }}></div>

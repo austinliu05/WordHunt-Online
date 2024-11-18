@@ -1,3 +1,7 @@
+export const EASY_DELAY = 1500;
+
+export const MEDIUM_DELAY = 0;
+
 // Scoring values based on word length
 export const SCORING: { [key: number]: number } = {
     3: 100,

@@ -14,6 +14,7 @@ interface GameContextType {
     updateOpponentScore: (points: number) => void;
     timeIsUp: () => void;
     goToStartScreen: () => void;
+    setDifficultyLevel: (level: string) => void;
 }
 
 const defaultGameContext: GameContextType = {
@@ -28,6 +29,7 @@ const defaultGameContext: GameContextType = {
     updateOpponentScore: () => { },
     timeIsUp: () => { },
     goToStartScreen: () => { },
+    setDifficultyLevel: () => { }
 };
 
 const GameContext = createContext<GameContextType>(defaultGameContext);
@@ -42,7 +44,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     const [opponentPlayerScore, setOpponentPlayerScore] = useState<number>(0);
     const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
     const [isGameOver, setIsGameOver] = useState<boolean>(false);
-    const [difficulty, setIsDifficulty] = useState<string>("easy");
+    const [difficulty, setDifficulty] = useState<string>("easy");
     const [isSinglePlayer, setisSinglePlayer] = useState<boolean>(false);
 
     const startGame = () => {
@@ -70,6 +72,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         setBoard(generateBoard(BOARD_SIZE, BOARD_SIZE));
     };
 
+    const setDifficultyLevel = (level: string) =>{
+        setDifficulty(level);
+    }
     // Generating and setting the 4x4 WordHunt board
     useEffect(() => {
         setBoard(generateBoard(BOARD_SIZE, BOARD_SIZE));
@@ -77,7 +82,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
     return (
         <GameContext.Provider
-            value={{ currentPlayerScore, board, difficulty, opponentPlayerScore, isGameStarted, isGameOver, startGame, updateCurrentScore, updateOpponentScore, timeIsUp, goToStartScreen }}
+            value={{ currentPlayerScore, board, difficulty, opponentPlayerScore, isGameStarted, isGameOver, startGame, updateCurrentScore, updateOpponentScore, timeIsUp, goToStartScreen, setDifficultyLevel }}
         >
             {children}
         </GameContext.Provider>

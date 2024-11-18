@@ -132,6 +132,5 @@ def load_trie_from_file(filepath: str) -> Trie:
 
 
 if __name__ == "__main__":
-    if os.path.exists("raw_dictionary.json") and os.path.exists("trie_dictionary.json"):
-        trie = build_trie_from_file('raw_dictionary.json')
-        save_trie_to_file(trie, 'trie_dictionary.json')
+    trie = build_trie_from_file('words_dictionary.json')
+    save_trie_to_file(trie, 'trie_dictionary.json')
