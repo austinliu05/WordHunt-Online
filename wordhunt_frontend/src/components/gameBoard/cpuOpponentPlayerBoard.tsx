@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
-import { EASY_DELAY, MEDIUM_DELAY, SCORING, TIMER_LENGTH } from '../../utils/constants';
+import { EASY_DELAY, MEDIUM_DELAY, HARD_DELAY, SCORING, TIMER_LENGTH } from '../../utils/constants';
 import { useGameContext } from '../../context/gameContext';
 import { useWordContext } from '../../context/wordContext';
 import { validateWord } from '../../utils/validateWord';
@@ -27,7 +27,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
   const location = useLocation();
   const requestInProgress = useRef(false);
   const isComponentActive = useRef(true);
-  let cpuDelay = EASY_DELAY;
+  let cpuDelay = HARD_DELAY;
 
   const {
     board,
@@ -56,7 +56,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
     if (words && Object.keys(words).length > 0 && isGameStarted && !isGameOver) {
       if (difficulty === 'easy') {
         cpuDelay = EASY_DELAY;
-      } else if (difficulty === 'medium') {
+      } else if (difficulty === 'medium'){
         cpuDelay = MEDIUM_DELAY;
       }
       simulatePlayerMoves();
@@ -79,7 +79,6 @@ const CPUOpponentPlayerBoard: React.FC = () => {
         throw new Error(`Request failed with status ${response.status}`);
       }
       const data = await response.json();
-      console.log('Response from backend:', data.paths);
       setWords(data.paths);
     } catch (error) {
       console.error('Error making request: ', error);
@@ -97,9 +96,12 @@ const CPUOpponentPlayerBoard: React.FC = () => {
   };
 
   const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-  const randomDelay = () => Math.floor(Math.random() * ((cpuDelay + 500) - cpuDelay + 1)) + cpuDelay;
+  const randomDelay = () => Math.floor(Math.random() * ((cpuDelay + 300) - cpuDelay + 1)) + cpuDelay;
 
   const randomizeMoves = () => {
+    if (difficulty === 'hard'){
+      return Object.entries(words);
+    }
     const entries = Object.entries(words);
 
     // Shuffle the entries array using the Fisher-Yates algorithm
@@ -120,6 +122,12 @@ const CPUOpponentPlayerBoard: React.FC = () => {
     for (const [word, indices] of randomizeMoves()) {
       if (isTimeExpired || !isComponentActive.current) {
         return;
+      }
+      if (difficulty === 'hard') {
+        const isValid = await validateWord(word);
+        if (!isValid) {
+            continue;
+        }
       }
       let localCurrentWord = '';
       let isValid = false;

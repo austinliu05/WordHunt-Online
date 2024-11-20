@@ -1,3 +1,5 @@
+const { DIRECTIONS, VOWELS, WORD_PRIORITY, ALPHA, BETA, GAMMA, WORD_PREFIXES} = require('./constants');
+
 /**
  * Checks if given coordinates are within the bounds of a specified dimension.
  * @param {number} x - The x-coordinate to check.
@@ -47,20 +49,52 @@ function checkWordOrPrefixInTrie(word, trie) {
 }
 
 /**
- * Validates if a word exists in the Firebase database under the `/words` node.
- * @param {string} word - The word to validate.
- * @returns {Promise<boolean>} - Resolves to true if the word exists, false otherwise.
+ * A custom heuristic that assigns each tile a custom value before returning a list of prioritized tiles.
+ * @param {string[][]} board - The board.
+ * @returns {Array<number>} A list of tiles in order of priority. 
  */
-const db = require('../wordhunt_dictionary_script/config/firebaseConfig');
-
-const isWordValidInDatabase = async (word) => {
-    try {
-        const snapshot = await db.ref(`/words/${word}`).once('value');
-        return snapshot.exists();
-    } catch (error) {
-        console.error('Error checking word validity:', error);
-        return false;
+function heuristic(board) {
+    const n = board.length
+    let evaluations = [];
+    for (let i = 0; i < n; i++){
+        for (let j = 0; j < n; j++){
+            let evaluation = 0;
+            evaluation += countVowels(board, i, j);
+            evaluation += letterPriority(board[i][j]);
+            evaluation += countPrefix(board, i, j);
+            evaluations.push({ index: { row: i, col: j}, letter: board[i][j], score: evaluation});
+        }
     }
-};
+    console.log("Heuristic evaluations: ", evaluations);
+    return evaluations.sort((a,b) => b.score - a.score).map(e => e.index);
+}
 
-module.exports = { checkBounds, randomGenerate, checkWordOrPrefixInTrie, isWordValidInDatabase };
+function countVowels(board, x, y){
+    const n = board.length
+    let vowelCount = 0
+    DIRECTIONS.forEach(function(element){
+        const [r,c] = element;
+        if (checkBounds(x + r, y + c, n) ){
+            vowelCount++;
+        }
+    });
+    return ALPHA * vowelCount;
+}
+
+function letterPriority(letter){
+    return BETA * WORD_PRIORITY.indexOf(letter);
+}
+
+function countPrefix(board, x, y){
+    const n = board.length
+    let prefixCount = 0
+    DIRECTIONS.forEach(function(element){
+        const [r,c] = element;
+        if (checkBounds(x + r, y + c, n) && WORD_PREFIXES.has(board[x][y] + board[x + r][y + c])){
+            prefixCount++;
+        }
+    });
+    return GAMMA * prefixCount;
+}
+
+module.exports = { checkBounds, randomGenerate, checkWordOrPrefixInTrie, heuristic };

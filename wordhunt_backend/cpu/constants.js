@@ -1,18 +1,26 @@
-const DIRECTIONS = [[1,0], [0,1], [-1,0], [0,-1], [1,1], [-1,-1], [1,-1], [-1,1]];
+const ALPHA = 2.5;
 
-const LIMITED_PATHS = 350;
+const BETA = 1.0;
+
+const DIRECTIONS = [[1, 0], [0, 1], [-1, 0], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]];
+
+const LIMITED_PATHS = 400;
 
 const EASY_LIMITED_DEPTH = 5;
 
+const GAMMA = 6.0;
+
 const MEDIUM_LIMITED_DEPTH = 8;
 
-const PREFIXES = ['a', 'be', 'de','dis','ex','in','mis','non','over','pre',
-'re','uni','with'];
+const VOWELS = 'aeio';
 
-const VOWELS = 'AEIOU';
+const WORD_PRIORITY = 'estrainolchdpbmfgwykvjqxzu';
 
-const WORD_PRIORITY = 'SCPABTMRDEFGLHINOWVKJQYZXU';
+const WORD_PREFIXES = new Set([
+    're', 'un', 'in', 'de', 'en', 'an', 'ex',
+    'be', 'co', 'di', 'im', 'pr', 'tr'
+]);
 
-module.exports = { DIRECTIONS, LIMITED_PATHS, EASY_LIMITED_DEPTH, MEDIUM_LIMITED_DEPTH, PREFIXES, VOWELS, WORD_PRIORITY };
+module.exports = { ALPHA, BETA, GAMMA, WORD_PREFIXES, DIRECTIONS, LIMITED_PATHS, EASY_LIMITED_DEPTH, MEDIUM_LIMITED_DEPTH, VOWELS, WORD_PRIORITY };
 
 

@@ -9,7 +9,7 @@ app.use(cors());
 
 // Routes
 app.get('/', (req, res) => {
-    res.send('Welcome to the Wordhunt API! v2.0.0');
+    res.send('Welcome to the Wordhunt API! v2.2.0');
 });
 
 app.post('/api/data', (req, res) => {

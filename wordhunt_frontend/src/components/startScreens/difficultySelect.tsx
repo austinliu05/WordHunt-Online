@@ -36,11 +36,11 @@ const DifficultySelect: React.FC = () => {
                     Medium
                 </Button>
                 <Button
-                    variant="secondary"
+                    variant="info"
                     className="py-3 fs-5 fw-bold"
-                    disabled
+                    onClick={() => navigateToGame('hard')}
                 >
-                    Hard (not available)
+                    Hard
                 </Button>
                 <div className="mt-4">
                     <ReturnHomeButton />
