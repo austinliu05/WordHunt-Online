@@ -1,5 +1,5 @@
 const { DIRECTIONS, LIMITED_PATHS, EASY_LIMITED_DEPTH, MEDIUM_LIMITED_DEPTH } = require('./constants');
-const {checkBounds, randomGenerate, checkWordOrPrefixInTrie, heuristic} = require('./utils')
+const { checkBounds, randomGenerate, checkWordOrPrefixInTrie, heuristic, checkForS} = require('./utils')
 const trie = require('../wordhunt_dictionary_script/trie_dictionary/trie_dictionary.json');
 /**
  * Main function to handle game logic by combining word search and difficulty-specific pathfinding.
@@ -53,7 +53,7 @@ function easyFindPaths(board) {
 
             if (isWord && !words.has(newWord) && newWord.length > 2) {
                 words.add(newWord);
-                paths[newWord] = [...path, [x,y]];
+                paths[newWord] = [...path, [x, y]];
                 pathCount++;
             }
 
@@ -102,7 +102,7 @@ function mediumFindPaths(board) {
 
             if (isWord && !words.has(newWord) && newWord.length > 2) {
                 words.add(newWord);
-                paths[newWord] = [...path, [x,y]];
+                paths[newWord] = [...path, [x, y]];
                 pathCount++;
             }
 
@@ -145,13 +145,27 @@ function hardFindPaths(board) {
         if (!isPrefix) {
             return;
         }
-
         if (isWord && !words.has(newWord) && newWord.length > 2) {
             words.add(newWord);
             paths[newWord] = [...path, [x, y]];
             pathCount++;
-        }
 
+            const result = checkForS(board, x, y, DIRECTIONS);
+            
+            if (result.found) {
+                const [row_S, col_S] = result.coordinates;
+                const coordinateKey = `${row_S},${col_S}`;
+                if (!visited.has(coordinateKey)) {
+                    const pluralWord = newWord + 's';
+            
+                    if (!words.has(pluralWord)) {
+                        words.add(pluralWord);
+                        paths[pluralWord] = [...path, [x, y], result.coordinates];
+                        pathCount++;
+                    }
+                }
+            }
+        }
         visited.add(`${x},${y}`);
         path.push([x, y]);
 

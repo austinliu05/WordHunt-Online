@@ -97,4 +97,28 @@ function countPrefix(board, x, y){
     return GAMMA * prefixCount;
 }
 
-module.exports = { checkBounds, randomGenerate, checkWordOrPrefixInTrie, heuristic };
+/**
+ * Checks if there is an 's' in any adjacent tile around the given coordinates.
+ *
+ * @param {string[][]} board - The board as a 2D array of letters.
+ * @param {number} x - The x-coordinate of the current tile.
+ * @param {number} y - The y-coordinate of the current tile.
+ * @param {Array<Array<number>>} directions - The directions to check for neighbors.
+ * @returns {Object} An object containing:
+ *                   - `found`: boolean indicating if an 's' was found.
+ *                   - `coordinates`: the [r, c] coordinates of the found 's' or null if none was found.
+ */
+function checkForS(board, x, y, directions) {
+    const n = board.length; // Assumes a square grid
+    for (let [dx, dy] of directions) {
+        const nx = x + dx;
+        const ny = y + dy;
+
+        if (checkBounds(nx, ny, n) && board[nx][ny] === 's') {
+            return { found: true, coordinates: [nx, ny] }; // Found an 's'
+        }
+    }
+    return { found: false, coordinates: null }; // No 's' found
+}
+
+module.exports = { checkBounds, randomGenerate, checkWordOrPrefixInTrie, heuristic, checkForS };
