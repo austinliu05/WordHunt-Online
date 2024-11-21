@@ -5,8 +5,8 @@ import { EASY_DELAY, MEDIUM_DELAY, HARD_DELAY, SCORING, TIMER_LENGTH } from '../
 import { useGameContext } from '../../context/gameContext';
 import { useWordContext } from '../../context/wordContext';
 import { validateWord } from '../../utils/validateWord';
-import TrackingSelectedTiles from './trackingSelectedTiles';
-import './gameBoard.css';
+import TrackingSelectedTiles from './TrackingSelectedTiles';
+import './Gameboard.css';
 
 interface Tile {
   row: number;

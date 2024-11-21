@@ -3,9 +3,9 @@ import { Button, Container, Row, Col } from 'react-bootstrap';
 import { SCORING, MAX_DISPLAYED_WORDS } from '../../utils/constants';
 import { useWordContext } from '../../context/wordContext';
 import { useGameContext } from '../../context/gameContext';
-import ReturnHomeButton from './returnHomeButton';
-import WinPopup from './winPopup';
-import LosePopup from './losePopup';
+import ReturnHomeButton from './ReturnHomeButton';
+import WinPopup from './WinPopup';
+import LosePopup from './LosePopup';
 
 const EndScreen: React.FC = () => {
     const { words: playerWords, cpuWords: opponentWords} = useWordContext();

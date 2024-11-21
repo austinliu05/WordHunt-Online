@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import StartScreen from './components/startScreens/startScreen';
-import DifficultySelect from './components/startScreens/difficultySelect';
-import EndScreen from './components/endScreen/endScreen';
-import Footer from './components/footer';
-import SplitScreen from './components/splitScreen';
-import GameLobby from './components/multiplayer/gameLobby';
+import StartScreen from './components/startScreens/StartScreen';
+import DifficultySelect from './components/startScreens/DifficultySelect';
+import EndScreen from './components/endScreen/EndScreen';
+import Footer from './components/Footer';
+import SplitScreen from './components/SplitScreen';
+import GameLobby from './components/multiplayer/GameLobby';
 import { useGameContext } from './context/gameContext';
 
 const App = () => {

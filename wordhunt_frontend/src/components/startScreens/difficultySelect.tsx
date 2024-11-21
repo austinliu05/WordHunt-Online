@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Container } from 'react-bootstrap';
 import { useGameContext } from '../../context/gameContext';
 import { useNavigate } from 'react-router-dom';
-import ReturnHomeButton from '../endScreen/returnHomeButton';
+import ReturnHomeButton from '../endScreen/ReturnHomeButton';
 
 const DifficultySelect: React.FC = () => {
     const { setDifficultyLevel, startGame } = useGameContext();

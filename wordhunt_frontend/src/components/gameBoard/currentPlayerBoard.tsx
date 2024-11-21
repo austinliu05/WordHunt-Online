@@ -4,8 +4,8 @@ import { SCORING } from '../../utils/constants';
 import { validateWord } from '../../utils/validateWord';
 import { useGameContext } from '../../context/gameContext';
 import { useWordContext } from '../../context/wordContext';
-import TrackingSelectedTiles from './trackingSelectedTiles';
-import './gameBoard.css'
+import TrackingSelectedTiles from './TrackingSelectedTiles';
+import './Gameboard.css'
 
 interface Tile {
   row: number;
