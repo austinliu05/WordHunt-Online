@@ -1,5 +1,5 @@
 import React from 'react';
-import tutorialImage from '../../assets/images/tutorial.png';
+import tutorialImage from '../assets/images/tutorial.png';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 

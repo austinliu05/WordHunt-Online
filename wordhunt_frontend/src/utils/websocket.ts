@@ -4,7 +4,7 @@ let socket: Socket | null = null;
 
 /**
  * Connects to the WebSocket server and returns the socket instance.
- * @param url The WebSocket server URL (e.g., "http://localhost:3000").
+ * @param url The WebSocket server URL (e.g., "http://localhost:6000").
  */
 export const connectSocket = (url: string): Socket => {
     if (!socket) {

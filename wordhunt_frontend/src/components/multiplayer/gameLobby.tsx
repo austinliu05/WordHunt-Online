@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { connectSocket, getSocket } from "../../utils/websocket";
+import { connectSocket, getSocket, disconnectSocket } from "../../utils/websocket";
 import { useGameContext } from "../../context/gameContext";
 
 const GameLobby = () => {
@@ -11,31 +11,34 @@ const GameLobby = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const serverURL = process.env.REACT_APP_BACKEND_URL;
+        const serverURL = process.env.REACT_APP_WEBSOCKET_URL;
         const socket = connectSocket(`${serverURL}`);
 
         socket.emit("joinLobby");
 
-        socket.on("lobbyUpdate", (data: {room: string; players: string[]}) => {
-            setRoom(data.room);
+        socket.on("lobbyUpdate", (data: { players: string[] }) => {
             setPlayers(data.players);
 
-            if(data.players.length === 2){
+            if (data.players.length === 2) {
                 setStatus("Player found! Starting game...");
-                setTimeout(() => navigate(`/game/${data.room}`), 3000);
             }
         });
 
-        return () =>{
-            socket.off("lobbyUpdate")
+        socket.on("startGame", (data: { room: string, players: string[] }) => {
+            setRoom(data.room);
+            navigate(`/game/${data.room}`, { state: { room: data.room, players: data.players } });
+        });
+
+        return () => {
+            disconnectSocket();
         };
     }, [navigate])
 
-    const goBack = () =>{
+    const goBack = () => {
         navigate('/');
         goToStartScreen();
     }
-    return (
+    const renderLobby = () => (
         <div className="container text-center mt-5">
             <div className="row justify-content-center">
                 <div className="col-lg-6 col-md-8 col-sm-10">
@@ -45,35 +48,45 @@ const GameLobby = () => {
                             {status}
                         </p>
 
-                        <h2 className="mb-3">Players in Room:</h2>
+                        <h2 className="mb-3">Players in Lobby:</h2>
                         <ul className="list-group mb-4">
-                            {players.length > 0 ? (
-                                players.map((player, index) => (
-                                    <li className="list-group-item" key={index}>
-                                        Player {index + 1}: {player}
-                                    </li>
-                                ))
-                            ) : (
-                                <li className="list-group-item text-muted">No players connected yet</li>
-                            )}
+                            {players.map((player, index) => (
+                                <li className="list-group-item" key={index}>
+                                    Player {index + 1}: {player}
+                                </li>
+                            ))}
                         </ul>
 
-                        {players.length < 2 && (
-                            <p className="text-muted">Waiting for another player to join...</p>
-                        )}
-                        {players.length === 2 && <p className="text-success">Game will start shortly!</p>}
+                        <p className="text-muted">Waiting for another player to join...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 
+    const renderGameRoom = () => (
+        <div className="container text-center mt-5">
+            <div className="row justify-content-center">
+                <div className="col-lg-6 col-md-8 col-sm-10">
+                    <div className="card p-4 shadow-sm">
+                        <h1 className="mb-4">Game Room</h1>
+                        <p className="alert alert-success">
+                            Room: {room}
+                        </p>
+                        <h2>Game is starting...</h2>
+                        <p>Good luck!</p>
                         <button
                             className="btn btn-danger mt-3"
                             onClick={goBack}
                         >
-                            Cancel
+                            Leave Game
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
+    return room ? renderGameRoom() : renderLobby();
 }
 
 export default GameLobby;

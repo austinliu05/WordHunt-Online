@@ -5,8 +5,7 @@ import { EASY_DELAY, MEDIUM_DELAY, HARD_DELAY, SCORING, TIMER_LENGTH } from '../
 import { useGameContext } from '../../context/gameContext';
 import { useWordContext } from '../../context/wordContext';
 import { validateWord } from '../../utils/validateWord';
-import TrackingSelectedTiles from './TrackingSelectedTiles';
-import './Gameboard.css';
+import TrackingSelectedTiles from '../gameBoard/TrackingSelectedTiles';
 
 interface Tile {
   row: number;
@@ -16,7 +15,7 @@ interface Tile {
   y: number;
 }
 
-const CPUOpponentPlayerBoard: React.FC = () => {
+const OpponentPlayerBoard: React.FC = () => {
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [words, setWords] = useState<{ [key: string]: any }>({});
   const [currentWord, setCurrentWord] = useState<string>('');
@@ -247,4 +246,4 @@ const CPUOpponentPlayerBoard: React.FC = () => {
   );
 };
 
-export default CPUOpponentPlayerBoard;
+export default OpponentPlayerBoard;
