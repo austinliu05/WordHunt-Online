@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import StartScreen from './components/StartScreen';
 import DifficultySelect from './components/singleplayer/DifficultySelect';
-import EndScreen from './components/endScreen/EndScreen';
+import EndScreen from './components/singleplayer/endScreen/EndScreen';
 import Footer from './components/Footer';
 import SplitScreen from './components/singleplayer/SplitScreen';
 import GameScreen from './components/multiplayer/GameScreen';

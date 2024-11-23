@@ -1,7 +1,8 @@
 import React from 'react';
 import { Button, Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { useGameContext } from '../../context/gameContext';
+import { useGameContext } from '../../../context/gameContext';
+import { disconnectSocket } from '../../../utils/websocket';
 
 const ReturnHomeButton: React.FC = () => {
     const { goToStartScreen } = useGameContext();
@@ -10,6 +11,7 @@ const ReturnHomeButton: React.FC = () => {
     const goBack = () =>{
         navigate('/');
         goToStartScreen();
+        disconnectSocket();
     }
     return (
         <Container className="d-flex justify-content-center align-items-center">

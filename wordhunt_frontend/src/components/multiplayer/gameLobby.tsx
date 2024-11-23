@@ -6,39 +6,54 @@ import { useGameContext } from "../../context/gameContext";
 const GameLobby = () => {
     const [status, setStatus] = useState<string>("Waiting for another player");
     const [players, setPlayers] = useState<string[]>([]);
-    const [room, setRoom] = useState<string | null>(null);
     const { goToStartScreen } = useGameContext();
     const navigate = useNavigate();
 
     useEffect(() => {
         const serverURL = process.env.REACT_APP_WEBSOCKET_URL;
-        const socket = connectSocket(`${serverURL}`);
 
-        socket.emit("joinLobby");
+        connectSocket(`${serverURL}`)
+            .then((socket) => {
+                socket.emit("joinLobby");
 
-        socket.on("lobbyUpdate", (data: { players: string[] }) => {
-            setPlayers(data.players);
+                socket.on("lobbyUpdate", (data: { players: string[] }) => {
+                    setPlayers(data.players);
+                    setStatus(data.players.length === 2 ? "Player found! Starting game..." : "Waiting for another player...");
+                });
 
-            if (data.players.length === 2) {
-                setStatus("Player found! Starting game...");
-            }
-        });
-
-        socket.on("startGame", (data: { room: string, players: string[] }) => {
-            setRoom(data.room);
-            navigate(`/game/${data.room}`, { state: { room: data.room, players: data.players } });
-        });
+                socket.on("startGame", (data: { room: string; players: string[]; board: string[][] }) => {
+                    console.log(`Game started in room ${data.room}`);
+                    navigate(`/game/${data.room}`, {
+                        state: {
+                            room: data.room,
+                            players: data.players,
+                            board: data.board,
+                        },
+                    });
+                });
+            })
+            .catch((error) => {
+                console.error("Socket connection error:", error);
+            });
 
         return () => {
-            disconnectSocket();
+            const socket = getSocket();
+            if (socket){
+                socket.off("lobbyUpdate");
+                socket.off("startGame");
+            }
         };
-    }, [navigate])
+    }, [navigate]);
 
     const goBack = () => {
+        const socket = getSocket();
+        socket.emit("leaveLobby");
+        disconnectSocket();
         navigate('/');
         goToStartScreen();
-    }
-    const renderLobby = () => (
+    };
+
+    return (
         <div className="container text-center mt-5">
             <div className="row justify-content-center">
                 <div className="col-lg-6 col-md-8 col-sm-10">
@@ -58,35 +73,14 @@ const GameLobby = () => {
                         </ul>
 
                         <p className="text-muted">Waiting for another player to join...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-
-    const renderGameRoom = () => (
-        <div className="container text-center mt-5">
-            <div className="row justify-content-center">
-                <div className="col-lg-6 col-md-8 col-sm-10">
-                    <div className="card p-4 shadow-sm">
-                        <h1 className="mb-4">Game Room</h1>
-                        <p className="alert alert-success">
-                            Room: {room}
-                        </p>
-                        <h2>Game is starting...</h2>
-                        <p>Good luck!</p>
-                        <button
-                            className="btn btn-danger mt-3"
-                            onClick={goBack}
-                        >
-                            Leave Game
+                        <button className="btn btn-danger mt-3" onClick={goBack}>
+                            Leave Lobby
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     );
-    return room ? renderGameRoom() : renderLobby();
-}
+};
 
 export default GameLobby;

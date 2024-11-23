@@ -4,6 +4,7 @@ import { validateWord } from '../../utils/validateWord';
 import { getTileCoordinates, isTileSelected } from '../../utils/boardHelpers';
 import { useGameContext } from '../../context/gameContext';
 import { useWordContext } from '../../context/wordContext';
+import TrackingSelectedTiles from '../gameBoard/TrackingSelectedTiles';
 import GameBoard from '../gameBoard/GameBoard';
 import '../gameBoard/GameBoard.css'
 
@@ -90,6 +91,12 @@ const CurrentPlayerBoard: React.FC = () => {
       onMouseUp={handleEnd}
       onTouchEnd={handleEnd}
     >
+      <TrackingSelectedTiles
+        selectedTiles={selectedTiles}
+        usedWords={usedWords}
+        selectedColor={selectedColor || ""}
+        isValidWord={isValidWord}
+      />
       <GameBoard
         ref={boardContainerRef}
         board={board}
@@ -102,7 +109,7 @@ const CurrentPlayerBoard: React.FC = () => {
           const touch = e.touches[0];
           const target = document.elementFromPoint(touch.clientX, touch.clientY);
           if (target && target.id.startsWith(`${playerType}-tile-`)) {
-            const [ , , row, col] = target.id.split('-');
+            const [, , row, col] = target.id.split('-');
             handleMove(parseInt(row), parseInt(col));
           }
         }}

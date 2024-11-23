@@ -1,7 +1,7 @@
-// src/context/index.tsx
 import React from 'react';
 import { GameProvider } from './gameContext';
 import { WordProvider } from './wordContext';
+import { MultiplayerGameProvider } from './multiplayerGameContext';
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -9,11 +9,13 @@ interface AppProvidersProps {
 
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
-    <GameProvider>
-      <WordProvider>
-        {children}
-      </WordProvider>
-    </GameProvider>
+    <MultiplayerGameProvider>
+      <GameProvider>
+        <WordProvider>
+          {children}
+        </WordProvider>
+      </GameProvider>
+    </MultiplayerGameProvider>
   );
 };
 

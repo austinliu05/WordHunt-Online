@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Container, Row, Col } from 'react-bootstrap';
-import { SCORING, MAX_DISPLAYED_WORDS } from '../../utils/constants';
-import { useWordContext } from '../../context/wordContext';
-import { useGameContext } from '../../context/gameContext';
+import { SCORING, MAX_DISPLAYED_WORDS } from '../../../utils/constants';
+import { useWordContext } from '../../../context/wordContext';
+import { useGameContext } from '../../../context/gameContext';
 import ReturnHomeButton from './ReturnHomeButton';
 import WinPopup from './WinPopup';
 import LosePopup from './LosePopup';
@@ -69,8 +69,8 @@ const EndScreen: React.FC = () => {
                 
                 <Col xs={12} md={6} className="p-5">
                     <div className="text-center mb-4 border-bottom border-light pb-2">
-                        <h5 className="mb-2 fw-bold">CPU WORDS: {opponentWords.length}</h5>
-                        <h3 className="text-warning fw-bold">CPU SCORE: {opponentPlayerScore}</h3>
+                        <h5 className="mb-2 fw-bold">Opponent WORDS: {opponentWords.length}</h5>
+                        <h3 className="text-warning fw-bold">Opponent SCORE: {opponentPlayerScore}</h3>
                     </div>
                     <div className="word-list w-100">
                         {displayedOpponentWords.map(([word, score], index) => (

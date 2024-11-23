@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { SCORING } from '../../utils/constants';
 import { validateWord } from '../../utils/validateWord';
+import { getSocket } from '../../utils/websocket';
 import { getTileCoordinates, isTileSelected } from '../../utils/boardHelpers';
-import { useGameContext } from '../../context/gameContext';
-import { useWordContext } from '../../context/wordContext';
 import GameBoard from '../gameBoard/GameBoard';
+import TrackingSelectedTiles from '../gameBoard/TrackingSelectedTiles';
+import { useMultiplayerGameContext } from '../../context/multiplayerGameContext';
 import '../gameBoard/GameBoard.css'
 
 interface Tile {
@@ -15,7 +15,13 @@ interface Tile {
   y: number;
 }
 
-const CurrentPlayerBoard: React.FC = () => {
+interface CurrentPlayerBoardProps {
+  room: string;
+  playerId: string;
+  board: string[][];
+}
+
+const CurrentPlayerBoard: React.FC<CurrentPlayerBoardProps> = ({ room, playerId, board }) => {
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [currentWord, setCurrentWord] = useState<string>("");
   const [usedWords, setUsedWords] = useState<string[]>([]);
@@ -24,8 +30,8 @@ const CurrentPlayerBoard: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState<string | null>();
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const playerType = 'p1';
-  const { board, updateCurrentScore } = useGameContext();
-  const { trackWords } = useWordContext();
+
+  const { incrementTick } = useMultiplayerGameContext();
 
   useEffect(() => {
     const preventTouchMove = (e: TouchEvent) => {
@@ -43,23 +49,26 @@ const CurrentPlayerBoard: React.FC = () => {
       const newTile = { row, col, letter: board[row][col], x, y };
       setSelectedTiles([newTile]);
       setCurrentWord(board[row][col]);
+      sendTileUpdate(newTile, "start", false, null); // Passing null for initial color
     }
   };
 
-  const handleEnd = () => {
+  const handleEnd = async () => {
     setIsDragging(false);
 
     if (currentWord.length > 2 && selectedColor === "green") {
-      const points = SCORING[currentWord.length] || 0;
-
       if (!usedWords.includes(currentWord)) {
         setUsedWords((prevWords) => [...prevWords, currentWord]);
-        updateCurrentScore(points);
-        const newWords = [...usedWords, currentWord];
-        trackWords(newWords);
+        const isValid = await validateWord(currentWord);
+        console.log(currentWord, "is ", isValid);
+        sendTileUpdate(
+          selectedTiles[selectedTiles.length - 1],
+          "end",
+          isValid,
+          selectedColor
+        );
       }
     }
-
     setSelectedTiles([]);
     setCurrentWord("");
     setSelectedColor(null);
@@ -76,12 +85,36 @@ const CurrentPlayerBoard: React.FC = () => {
         setCurrentWord(newWord);
 
         const isValid = await validateWord(newWord);
-        setIsValidWord(isValid);
         const isUsed = usedWords.includes(newWord);
 
-        setSelectedColor(isValid && newWord.length > 2 ? (isUsed ? "yellow" : "green") : null);
+        const newColor = isValid && newWord.length > 2 ? (isUsed ? "yellow" : "green") : null;
+        setSelectedColor(newColor);
+
+        sendTileUpdate(newTile, "update", isValid, newColor); // Pass the calculated color
       }
     }
+  };
+
+  const sendTileUpdate = (
+    tile: Tile,
+    action: "start" | "update" | "end",
+    valid: boolean,
+    color: string | null
+  ) => {
+    const socket = getSocket();
+
+    socket.emit("tileUpdate", {
+      room,
+      playerId,
+      word: currentWord,
+      tile: { row: tile.row, col: tile.col, letter: tile.letter },
+      isFirstTile: action === "start",
+      isLastTile: action === "end",
+      isValid: valid,
+      selectedColor: color, // Use the passed color
+    });
+
+    incrementTick();
   };
 
   return (
@@ -90,6 +123,12 @@ const CurrentPlayerBoard: React.FC = () => {
       onMouseUp={handleEnd}
       onTouchEnd={handleEnd}
     >
+      <TrackingSelectedTiles
+        selectedTiles={selectedTiles}
+        usedWords={usedWords}
+        selectedColor={selectedColor || ""}
+        isValidWord={isValidWord}
+      />
       <GameBoard
         ref={boardContainerRef}
         board={board}
@@ -102,7 +141,7 @@ const CurrentPlayerBoard: React.FC = () => {
           const touch = e.touches[0];
           const target = document.elementFromPoint(touch.clientX, touch.clientY);
           if (target && target.id.startsWith(`${playerType}-tile-`)) {
-            const [ , , row, col] = target.id.split('-');
+            const [, , row, col] = target.id.split('-');
             handleMove(parseInt(row), parseInt(col));
           }
         }}

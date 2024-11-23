@@ -1,22 +1,38 @@
-import React from "react";
-import {useParams, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import SplitScreen from "./SplitScreen";
+import { getSocket } from "../../utils/websocket";
 
 const GameScreen = () => {
-    const navigate = useNavigate();
-    const { room: paramRoom } = useParams<{ room: string }>();
+    const location = useLocation();
+    const { room, players, board } = location.state || {};
+    const [playerId, setPlayerId] = useState<string>("");
+    const [player2ID, setPlayer2ID] = useState<string>("");
 
-    const { room } = { room: paramRoom};
+    useEffect(() => {
+        const socket = getSocket();
 
-    if (!room) {
-        navigate("/");
-        return null;
+        if (socket && socket.id) {
+            const currentPlayerId = socket.id;
+            console.log("Current player:", currentPlayerId)
+            setPlayerId(currentPlayerId);
+        } else {
+            console.error("Socket is not connected or ID is unavailable.");
+        }
+    }, [players]);
+
+    if (!room || !players || !board) {
+        return (
+            <div className="container text-center mt-5">
+                <h1>Error: Missing game data</h1>
+                <p>Please return to the lobby and try again.</p>
+            </div>
+        );
     }
 
     return (
         <div className="container text-center mt-5">
-            <h1>Game Room: {room}</h1>
-            <SplitScreen></SplitScreen>
+            <SplitScreen room={room} player={playerId}  board={board} />
         </div>
     );
 };

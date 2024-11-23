@@ -2,8 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { EASY_DELAY, MEDIUM_DELAY, HARD_DELAY, SCORING, TIMER_LENGTH } from '../../utils/constants';
 import { validateWord } from '../../utils/validateWord';
-import { delay, getTileCoordinates, randomizeMoves, isTileSelected,  } from '../../utils/boardHelpers';
+import { delay, getTileCoordinates, randomizeMoves, isTileSelected, } from '../../utils/boardHelpers';
 import GameBoard from '../gameBoard/GameBoard';
+import TrackingSelectedTiles from '../gameBoard/TrackingSelectedTiles';
 import { useGameContext } from '../../context/gameContext';
 import { useWordContext } from '../../context/wordContext';
 import '../gameBoard/GameBoard.css'
@@ -57,7 +58,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
     if (words && Object.keys(words).length > 0 && isGameStarted && !isGameOver) {
       if (difficulty === 'easy') {
         cpuDelay = EASY_DELAY;
-      } else if (difficulty === 'medium'){
+      } else if (difficulty === 'medium') {
         cpuDelay = MEDIUM_DELAY;
       }
       simulatePlayerMoves();
@@ -103,7 +104,7 @@ const CPUOpponentPlayerBoard: React.FC = () => {
       if (difficulty === 'hard') {
         const isValid = await validateWord(word);
         if (!isValid) {
-            continue;
+          continue;
         }
       }
       let localCurrentWord = '';
@@ -161,6 +162,12 @@ const CPUOpponentPlayerBoard: React.FC = () => {
 
   return (
     <div className="d-flex flex-column justify-content-center mt-4 m-3">
+      <TrackingSelectedTiles
+        selectedTiles={selectedTiles}
+        usedWords={usedWords}
+        selectedColor={selectedColor || ""}
+        isValidWord={isValidWord}
+      />
       <GameBoard
         ref={boardContainerRef}
         board={board}

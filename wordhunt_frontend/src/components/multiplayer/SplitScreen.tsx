@@ -1,36 +1,58 @@
-import React, { useEffect, useRef } from 'react';
-import { useGameContext } from '../../context/gameContext';
-import Scoreboard from '../gameBoard/Scoreboard';
-import Timer from '../gameBoard/Timer';
-import CurrentPlayerBoard from '../singleplayer/CurrentPlayerBoard';
-import OpponentPlayerBoard from './OpponentPlayerBoard';
+import React, { useEffect, useState } from "react";
+import CurrentPlayerBoard from "./CurrentPlayerBoard";
+import OpponentPlayerBoard from "./OpponentPlayerBoard";
+import Timer from "../gameBoard/Timer";
+import Scoreboard from "../gameBoard/Scoreboard";
+import { getSocket } from "../../utils/websocket";
+import { useMultiplayerGameContext } from "../../context/multiplayerGameContext";
 
-const SplitScreen: React.FC = () => {
-    const { currentPlayerScore, opponentPlayerScore } = useGameContext();
+const SplitScreen: React.FC<{ room: string; player: string; board: string[][] }> = ({ room, player, board }) => {
+    const [playerScore, setPlayerScore] = useState<number>(0);
+    const [opponentScore, setOpponentScore] = useState<number>(0);
+
+    const {tick} = useMultiplayerGameContext();
+    
+    useEffect(() => {
+        const socket = getSocket();
+        if (!socket.connected) {
+            console.error("WebSocket not connected. Ensure connectSocket is called in GameLobby.");
+        }
+    
+        const handlePlayerMove = ({ playerId, word, score }: { playerId: string; word: string; score: number }) => {
+            console.log(score)
+            if (playerId === socket.id) {
+                setPlayerScore(score); 
+            } else {
+                setOpponentScore(score);
+            }
+        };
+
+        socket.on("tileUpdate", handlePlayerMove);
+
+        return () => {
+            socket.off("tileUpdate", handlePlayerMove);
+        };
+    }, [tick]);
 
     return (
         <div className="container-fluid">
             <div className="row bg-dark py-2">
-                <div className='col-6 text-center'>
-                    <Scoreboard score={currentPlayerScore} player='Your' />
+                <div className="col-6 text-center">
+                    <Scoreboard score={playerScore} player="Your" />
                 </div>
-                <div className='col-6 text-center'>
-                    <Scoreboard score={opponentPlayerScore} player='Opponent' />
+                <div className="col-6 text-center">
+                    <Scoreboard score={opponentScore} player="Opponent" />
                 </div>
             </div>
             <Timer />
-            <div className='row'>
+            <div className="row">
                 <div className="col-md-6 d-flex justify-content-center">
-                    <CurrentPlayerBoard />
+                    <CurrentPlayerBoard room={room} board={board} playerId={player} />
                 </div>
-                <div className="col-md-1 d-none d-md-flex align-items-center">
-                    <div className="border-start h-100" style={{ borderWidth: '2px' }}></div>
-                </div>
-                <div className="col-md-4 d-flex justify-content-center">
-                    <OpponentPlayerBoard />
+                <div className="col-md-6 d-flex justify-content-center">
+                    <OpponentPlayerBoard room={room} board={board} playerId={player} />
                 </div>
             </div>
-
         </div>
     );
 };
