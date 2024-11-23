@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Row, Col } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 import { EASY_DELAY, MEDIUM_DELAY, HARD_DELAY, SCORING, TIMER_LENGTH } from '../../utils/constants';
+import { validateWord } from '../../utils/validateWord';
+import { delay, getTileCoordinates, randomizeMoves, isTileSelected,  } from '../../utils/boardHelpers';
+import GameBoard from '../gameBoard/GameBoard';
 import { useGameContext } from '../../context/gameContext';
 import { useWordContext } from '../../context/wordContext';
-import { validateWord } from '../../utils/validateWord';
-import TrackingSelectedTiles from '../gameBoard/TrackingSelectedTiles';
+import '../gameBoard/GameBoard.css'
 
 interface Tile {
   row: number;
@@ -26,6 +27,7 @@ const OpponentPlayerBoard: React.FC = () => {
   const location = useLocation();
   const requestInProgress = useRef(false);
   const isComponentActive = useRef(true);
+  const playerType = 'p2';
   let cpuDelay = HARD_DELAY;
 
   const {
@@ -84,32 +86,8 @@ const OpponentPlayerBoard: React.FC = () => {
     }
   };
 
-  const getTileCoordinates = (tileElement: HTMLElement) => {
-    const containerRect = boardContainerRef.current?.getBoundingClientRect();
-    const tileRect = tileElement.getBoundingClientRect();
-
-    return {
-      x: tileRect.left - (containerRect?.left || 0) + tileRect.width / 2,
-      y: tileRect.top - (containerRect?.top || 0) + tileRect.height / 2,
-    };
-  };
-
-  const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
   const randomDelay = () => Math.floor(Math.random() * ((cpuDelay + 300) - cpuDelay + 1)) + cpuDelay;
 
-  const randomizeMoves = () => {
-    if (difficulty === 'hard'){
-      return Object.entries(words);
-    }
-    const entries = Object.entries(words);
-
-    // Shuffle the entries array using the Fisher-Yates algorithm
-    for (let i = entries.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1)); 
-      [entries[i], entries[j]] = [entries[j], entries[i]]; 
-    }
-    return entries;
-  }
   const simulatePlayerMoves = async () => {
     let usedWords: string[] = [];
     let isTimeExpired = false;
@@ -118,7 +96,7 @@ const OpponentPlayerBoard: React.FC = () => {
       isTimeExpired = true;
     }, TIMER_LENGTH * 1000);
 
-    for (const [word, indices] of randomizeMoves()) {
+    for (const [word, indices] of randomizeMoves(Object.entries(words), difficulty)) {
       if (isTimeExpired || !isComponentActive.current) {
         return;
       }
@@ -140,9 +118,9 @@ const OpponentPlayerBoard: React.FC = () => {
         setCurrentWord(localCurrentWord);
 
         const [row, col] = indices[i];
-        const tileElement = document.getElementById(`cpu-tile-${row}-${col}`);
+        const tileElement = document.getElementById(`${playerType}-tile-${row}-${col}`);
         if (tileElement) {
-          const { x, y } = getTileCoordinates(tileElement);
+          const { x, y } = getTileCoordinates(tileElement, boardContainerRef.current);
           const newTile = { row, col, letter: board[row][col], x, y };
           setSelectedTiles((prev) => [...prev, newTile]);
         }
@@ -176,69 +154,21 @@ const OpponentPlayerBoard: React.FC = () => {
   const checkWordValue = async (word: string, isTimeExpired: boolean, isValid: boolean) => {
     if (word.length > 2 && !usedWords.includes(word) && !isTimeExpired && isValid) {
       const points = SCORING[word.length] || 0;
-      console.log(`Adding ${points} points for word: ${word}`);
+      // console.log(`Adding ${points} points for word: ${word}`);
       updateOpponentScore(points);
     }
   };
 
-  const isTileSelected = (row: number, col: number): boolean =>
-    selectedTiles.some((tile) => tile.row === row && tile.col === col);
-
   return (
-    <div
-      className="d-flex flex-column justify-content-center mt-4 m-3"
-    >
-      <TrackingSelectedTiles selectedTiles={selectedTiles} usedWords={usedWords} selectedColor={selectedColor || 'white'} isValidWord={isValidWord} />
-      <div
-        className="board-container position-relative cpu-board"
+    <div className="d-flex flex-column justify-content-center mt-4 m-3">
+      <GameBoard
         ref={boardContainerRef}
-      >
-        <svg className="line-layer position-absolute w-100 h-100">
-          {selectedTiles.map((tile, index) => {
-            if (index === 0) return null;
-            const prevTile = selectedTiles[index - 1];
-            const lineColor = selectedColor === "green" || selectedColor === "yellow" ? "rgba(255, 255, 255, 0.6)" : "rgba(255, 0, 0, 0.4)";
-
-            return (
-              <line
-                key={index}
-                x1={prevTile.x}
-                y1={prevTile.y}
-                x2={tile.x}
-                y2={tile.y}
-                stroke={lineColor}
-                strokeWidth="6"
-                strokeLinecap="round"
-              />
-            );
-          })}
-        </svg>
-        {board.map((row, rowIndex) => (
-          <Row key={rowIndex} className="mx-0 mb-2">
-            {row.map((letter, colIndex) => {
-              const isSelected = isTileSelected(rowIndex, colIndex);
-              const tileColorClass = isSelected
-                ? selectedColor === "green"
-                  ? "selected-green"
-                  : selectedColor === "yellow"
-                    ? "selected-yellow"
-                    : "selected"
-                : "";
-
-              return (
-                <Col
-                  key={colIndex}
-                  id={`cpu-tile-${rowIndex}-${colIndex}`}
-                  className={`border p-3 text-center mx-1 ${tileColorClass}`}
-                >
-                  <h3>{letter}</h3>
-                </Col>
-              );
-            })}
-          </Row>
-        ))}
-      </div>
-
+        board={board}
+        selectedTiles={selectedTiles}
+        selectedColor={selectedColor || null}
+        isTileSelected={isTileSelected}
+        playerType={playerType}
+      />
       <div className="d-flex justify-content-center m-4">
         <h1>Opponent</h1>
       </div>

@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Row, Col } from 'react-bootstrap';
 import { SCORING } from '../../utils/constants';
 import { validateWord } from '../../utils/validateWord';
+import { getTileCoordinates, isTileSelected } from '../../utils/boardHelpers';
 import { useGameContext } from '../../context/gameContext';
 import { useWordContext } from '../../context/wordContext';
-import TrackingSelectedTiles from '../gameBoard/TrackingSelectedTiles';
-import './Gameboard.css'
+import GameBoard from '../gameBoard/GameBoard';
+import '../gameBoard/GameBoard.css'
 
 interface Tile {
   row: number;
@@ -23,7 +23,7 @@ const CurrentPlayerBoard: React.FC = () => {
   const [selectedTiles, setSelectedTiles] = useState<Tile[]>([]);
   const [selectedColor, setSelectedColor] = useState<string | null>();
   const [isDragging, setIsDragging] = useState<boolean>(false);
-
+  const playerType = 'p1';
   const { board, updateCurrentScore } = useGameContext();
   const { trackWords } = useWordContext();
 
@@ -35,21 +35,11 @@ const CurrentPlayerBoard: React.FC = () => {
     return () => document.removeEventListener('touchmove', preventTouchMove);
   }, [isDragging]);
 
-  const getTileCoordinates = (tileElement: HTMLElement) => {
-    const containerRect = boardContainerRef.current?.getBoundingClientRect();
-    const tileRect = tileElement.getBoundingClientRect();
-
-    return {
-      x: tileRect.left - (containerRect?.left || 0) + tileRect.width / 2,
-      y: tileRect.top - (containerRect?.top || 0) + tileRect.height / 2,
-    };
-  };
-
   const handleStart = (row: number, col: number) => {
     setIsDragging(true);
-    const tileElement = document.getElementById(`tile-${row}-${col}`);
+    const tileElement = document.getElementById(`${playerType}-tile-${row}-${col}`);
     if (tileElement) {
-      const { x, y } = getTileCoordinates(tileElement);
+      const { x, y } = getTileCoordinates(tileElement, boardContainerRef.current);
       const newTile = { row, col, letter: board[row][col], x, y };
       setSelectedTiles([newTile]);
       setCurrentWord(board[row][col]);
@@ -76,10 +66,10 @@ const CurrentPlayerBoard: React.FC = () => {
   };
 
   const handleMove = async (row: number, col: number) => {
-    if (isDragging && !isTileSelected(row, col)) {
-      const tileElement = document.getElementById(`tile-${row}-${col}`);
+    if (isDragging && !isTileSelected(row, col, selectedTiles)) {
+      const tileElement = document.getElementById(`${playerType}-tile-${row}-${col}`);
       if (tileElement) {
-        const { x, y } = getTileCoordinates(tileElement);
+        const { x, y } = getTileCoordinates(tileElement, boardContainerRef.current);
         const newTile = { row, col, letter: board[row][col], x, y };
         setSelectedTiles((prev) => [...prev, newTile]);
         const newWord = currentWord + board[row][col];
@@ -94,77 +84,32 @@ const CurrentPlayerBoard: React.FC = () => {
     }
   };
 
-  const isTileSelected = (row: number, col: number): boolean =>
-    selectedTiles.some((tile) => tile.row === row && tile.col === col);
-
   return (
     <div
       className="d-flex flex-column justify-content-center mt-4 m-3"
       onMouseUp={handleEnd}
       onTouchEnd={handleEnd}
     >
-      <TrackingSelectedTiles selectedTiles={selectedTiles} usedWords={usedWords} selectedColor={selectedColor || 'white'} isValidWord={isValidWord} />
-      <div
-        className="board-container position-relative"
+      <GameBoard
         ref={boardContainerRef}
-      >
-        <svg className="line-layer position-absolute w-100 h-100">
-          {selectedTiles.map((tile, index) => {
-            if (index === 0) return null;
-            const prevTile = selectedTiles[index - 1];
-            const lineColor = selectedColor === "green" || selectedColor === "yellow" ? "rgba(255, 255, 255, 0.6)" : "rgba(255, 0, 0, 0.4)";
-
-            return (
-              <line
-                key={index}
-                x1={prevTile.x}
-                y1={prevTile.y}
-                x2={tile.x}
-                y2={tile.y}
-                stroke={lineColor}
-                strokeWidth="6"
-                strokeLinecap="round"
-              />
-            );
-          })}
-        </svg>
-        {board.map((row, rowIndex) => (
-          <Row key={rowIndex} className="mx-0 mb-2">
-            {row.map((letter, colIndex) => {
-              const isSelected = isTileSelected(rowIndex, colIndex);
-              const tileColorClass = isSelected
-                ? selectedColor === "green"
-                  ? "selected-green"
-                  : selectedColor === "yellow"
-                    ? "selected-yellow"
-                    : "selected"
-                : "";
-
-              return (
-                <Col
-                  key={colIndex}
-                  id={`tile-${rowIndex}-${colIndex}`}
-                  className={`border p-3 text-center mx-1 ${tileColorClass}`}
-                  onMouseDown={() => handleStart(rowIndex, colIndex)}
-                  onMouseEnter={() => handleMove(rowIndex, colIndex)}
-                  onTouchStart={() => handleStart(rowIndex, colIndex)}
-                  onTouchMove={(e) => {
-                    const touch = e.touches[0];
-                    const target = document.elementFromPoint(touch.clientX, touch.clientY);
-                    if (target && target.id.startsWith('tile-')) {
-                      const [_, r, c] = target.id.split('-');
-                      handleMove(parseInt(r), parseInt(c));
-                    }
-                  }}
-                >
-                  <h3>{letter}</h3>
-                </Col>
-              );
-            })}
-          </Row>
-        ))}
-      </div>
-      <div className='d-flex justify-content-center m-4'>
+        board={board}
+        selectedTiles={selectedTiles}
+        selectedColor={selectedColor || null}
+        onTileMouseDown={handleStart}
+        onTileMouseEnter={handleMove}
+        onTileTouchStart={handleStart}
+        onTileTouchMove={(e) => {
+          const touch = e.touches[0];
+          const target = document.elementFromPoint(touch.clientX, touch.clientY);
+          if (target && target.id.startsWith(`${playerType}-tile-`)) {
+            const [ , , row, col] = target.id.split('-');
+            handleMove(parseInt(row), parseInt(col));
+          }
+        }}
+        isTileSelected={isTileSelected}
+        playerType={playerType}
+      />
+      <div className="d-flex justify-content-center m-4">
         <h1>You</h1>
       </div>
     </div>
