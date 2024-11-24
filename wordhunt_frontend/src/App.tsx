@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import StartScreen from './components/StartScreen';
 import DifficultySelect from './components/singleplayer/DifficultySelect';
 import EndScreen from './components/singleplayer/endScreen/EndScreen';
+import MultiplayerEndScreen from './components/multiplayer/endScreen/EndScreen';
 import Footer from './components/Footer';
 import SplitScreen from './components/singleplayer/SplitScreen';
 import GameScreen from './components/multiplayer/GameScreen';
@@ -24,6 +25,8 @@ const App = () => {
             <Route path="/lobby" element={<GameLobby />}/>
             <Route path="/difficulty" element={<DifficultySelect/>}/>
             {isGameOver && <Route path="/end" element={<EndScreen />} />}
+            <Route path="/end" element={<MultiplayerEndScreen />} />
+
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>

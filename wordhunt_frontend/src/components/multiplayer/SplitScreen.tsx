@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CurrentPlayerBoard from "./CurrentPlayerBoard";
 import OpponentPlayerBoard from "./OpponentPlayerBoard";
-import Timer from "../gameBoard/Timer";
+import Timer from "./Timer";
 import Scoreboard from "../gameBoard/Scoreboard";
 import { getSocket } from "../../utils/websocket";
 import { useMultiplayerGameContext } from "../../context/multiplayerGameContext";
@@ -19,7 +19,6 @@ const SplitScreen: React.FC<{ room: string; player: string; board: string[][] }>
         }
     
         const handlePlayerMove = ({ playerId, word, score }: { playerId: string; word: string; score: number }) => {
-            console.log(score)
             if (playerId === socket.id) {
                 setPlayerScore(score); 
             } else {

@@ -1,37 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import { SCORING, MAX_DISPLAYED_WORDS } from '../../../utils/constants';
-import { useWordContext } from '../../../context/wordContext';
-import { useGameContext } from '../../../context/gameContext';
+import { useLocation } from 'react-router-dom';
 import ReturnHomeButton from './ReturnHomeButton';
 import WinPopup from './WinPopup';
 import LosePopup from './LosePopup';
 
-const EndScreen: React.FC = () => {
-    const { words: playerWords, cpuWords: opponentWords} = useWordContext();
-    const { currentPlayerScore, opponentPlayerScore} = useGameContext();
+const MultiplayerEndScreen: React.FC = () => {
+    const location = useLocation();
+    const { players, playerId } = location.state || { players: {}, playerId: '' };
+    const currentPlayerData = players[playerId] || { score: 0, words: [] };
+    const opponentPlayerId = Object.keys(players).find((id) => id !== playerId);
+    const opponentPlayerData = players[opponentPlayerId || ''] || { score: 0, words: [] };
+
     const [showWinPopup, setShowWinPopup] = useState<boolean>(false);
     const [showLosePopup, setShowLosePopup] = useState<boolean>(false);
+    
     useEffect(() => {
-        if (currentPlayerScore > opponentPlayerScore){
+        if (currentPlayerData.score > opponentPlayerData.score) {
             setShowWinPopup(true);
             setShowLosePopup(false);
-        }else{
+        } else {
             setShowWinPopup(false);
             setShowLosePopup(true);
         }
-    },[currentPlayerScore, opponentPlayerScore])
+    }, [currentPlayerData.score, opponentPlayerData.score]);
 
     const getSortedWordsWithPoints = (words: string[]) =>
         words
             .sort((a, b) => b.length - a.length || b.localeCompare(a))
             .map(word => [word, SCORING[word.length] || 0] as [string, number]);
 
-    const playerWordsWithPoints = getSortedWordsWithPoints(playerWords);
+    const playerWordsWithPoints = getSortedWordsWithPoints(currentPlayerData.words);
     const displayedPlayerWords = playerWordsWithPoints.slice(0, MAX_DISPLAYED_WORDS);
     const remainingPlayerWords = playerWordsWithPoints.length - displayedPlayerWords.length;
 
-    const opponentWordsWithPoints = getSortedWordsWithPoints(opponentWords || []);
+    const opponentWordsWithPoints = getSortedWordsWithPoints(opponentPlayerData.words);
     const displayedOpponentWords = opponentWordsWithPoints.slice(0, MAX_DISPLAYED_WORDS);
     const remainingOpponentWords = opponentWordsWithPoints.length - displayedOpponentWords.length;
 
@@ -42,8 +46,8 @@ const EndScreen: React.FC = () => {
             <Row className="w-100">
                 <Col xs={12} md={6} className="p-5">
                     <div className="text-center mb-4 border-bottom border-light pb-2">
-                        <h5 className="mb-2 fw-bold">PLAYER WORDS: {playerWords.length}</h5>
-                        <h3 className="text-warning fw-bold">PLAYER SCORE: {currentPlayerScore}</h3>
+                        <h5 className="mb-2 fw-bold">PLAYER WORDS: {currentPlayerData.words.length}</h5>
+                        <h3 className="text-warning fw-bold">PLAYER SCORE: {currentPlayerData.score}</h3>
                     </div>
                     <div className="word-list w-100">
                         {displayedPlayerWords.map(([word, score], index) => (
@@ -66,11 +70,11 @@ const EndScreen: React.FC = () => {
                         </Button>
                     )}
                 </Col>
-                
+
                 <Col xs={12} md={6} className="p-5">
                     <div className="text-center mb-4 border-bottom border-light pb-2">
-                        <h5 className="mb-2 fw-bold">Opponent WORDS: {opponentWords.length}</h5>
-                        <h3 className="text-warning fw-bold">Opponent SCORE: {opponentPlayerScore}</h3>
+                        <h5 className="mb-2 fw-bold">OPPONENT WORDS: {opponentPlayerData.words.length}</h5>
+                        <h3 className="text-warning fw-bold">OPPONENT SCORE: {opponentPlayerData.score}</h3>
                     </div>
                     <div className="word-list w-100">
                         {displayedOpponentWords.map(([word, score], index) => (
@@ -95,10 +99,10 @@ const EndScreen: React.FC = () => {
                 </Col>
             </Row>
             <div className="mt-4 d-flex gap-2 w-75 justify-content-center">
-                <ReturnHomeButton/>
+                <ReturnHomeButton />
             </div>
         </Container>
     );
 };
 
-export default EndScreen;
+export default MultiplayerEndScreen;

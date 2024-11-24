@@ -7,7 +7,6 @@ const GameScreen = () => {
     const location = useLocation();
     const { room, players, board } = location.state || {};
     const [playerId, setPlayerId] = useState<string>("");
-    const [player2ID, setPlayer2ID] = useState<string>("");
 
     useEffect(() => {
         const socket = getSocket();
@@ -16,6 +15,8 @@ const GameScreen = () => {
             const currentPlayerId = socket.id;
             console.log("Current player:", currentPlayerId)
             setPlayerId(currentPlayerId);
+
+            socket.emit("timerStart", { room });
         } else {
             console.error("Socket is not connected or ID is unavailable.");
         }

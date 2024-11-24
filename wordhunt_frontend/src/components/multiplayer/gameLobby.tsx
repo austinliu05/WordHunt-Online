@@ -6,6 +6,7 @@ import { useGameContext } from "../../context/gameContext";
 const GameLobby = () => {
     const [status, setStatus] = useState<string>("Waiting for another player");
     const [players, setPlayers] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
     const { goToStartScreen } = useGameContext();
     const navigate = useNavigate();
 
@@ -22,14 +23,18 @@ const GameLobby = () => {
                 });
 
                 socket.on("startGame", (data: { room: string; players: string[]; board: string[][] }) => {
-                    console.log(`Game started in room ${data.room}`);
-                    navigate(`/game/${data.room}`, {
-                        state: {
-                            room: data.room,
-                            players: data.players,
-                            board: data.board,
-                        },
-                    });
+                    setIsLoading(true); // Show loading popup
+                    setTimeout(() => {
+                        // Navigate after 3 seconds
+                        console.log(`Game started in room ${data.room}`);
+                        navigate(`/game/${data.room}`, {
+                            state: {
+                                room: data.room,
+                                players: data.players,
+                                board: data.board,
+                            },
+                        });
+                    }, 2000);
                 });
             })
             .catch((error) => {
@@ -38,7 +43,7 @@ const GameLobby = () => {
 
         return () => {
             const socket = getSocket();
-            if (socket){
+            if (socket) {
                 socket.off("lobbyUpdate");
                 socket.off("startGame");
             }
@@ -46,8 +51,6 @@ const GameLobby = () => {
     }, [navigate]);
 
     const goBack = () => {
-        const socket = getSocket();
-        socket.emit("leaveLobby");
         disconnectSocket();
         navigate('/');
         goToStartScreen();
@@ -79,6 +82,21 @@ const GameLobby = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Loading popup */}
+            {isLoading && (
+                <div
+                    className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+                    style={{ backgroundColor: "rgba(0, 0, 0, 0.5)", zIndex: 1050 }}
+                >
+                    <div className="p-4 bg-white rounded shadow-lg">
+                        <h4>Loading game...</h4>
+                        <div className="spinner-border text-primary mt-3" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

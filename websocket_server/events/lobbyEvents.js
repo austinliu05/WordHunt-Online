@@ -14,6 +14,7 @@ function handleLobbyEvents(io, socket) {
         const players = Array.from(io.sockets.adapter.rooms.get("lobby") || []);
         io.to("lobby").emit("lobbyUpdate", { players });
 
+        console.log(getQueueSize())
         if (getQueueSize() >= 2) {
             const [player1Id, player2Id] = [removeFromQueue(), removeFromQueue()];
             const roomName = `room-${player1Id}-${player2Id}`;

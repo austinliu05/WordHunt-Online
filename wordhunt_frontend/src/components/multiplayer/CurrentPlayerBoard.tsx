@@ -60,7 +60,6 @@ const CurrentPlayerBoard: React.FC<CurrentPlayerBoardProps> = ({ room, playerId,
       if (!usedWords.includes(currentWord)) {
         setUsedWords((prevWords) => [...prevWords, currentWord]);
         const isValid = await validateWord(currentWord);
-        console.log(currentWord, "is ", isValid);
         sendTileUpdate(
           selectedTiles[selectedTiles.length - 1],
           "end",

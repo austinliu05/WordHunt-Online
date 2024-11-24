@@ -1,7 +1,51 @@
 const { rooms } = require("./lobbyEvents");
-const { SCORING } = require("../utils/constants")
+const { SCORING, TIMER } = require("../utils/constants")
 
 function handleGameEvents(io, socket) {
+    socket.on("timerStart", ({ room }) => {
+        console.log(`Timer started for room ${room}`);
+        if (!rooms[room]) {
+            console.error(`Room ${room} does not exist.`);
+            return;
+        }
+
+        const duration = TIMER;
+        let timeRemaining = duration;
+
+        io.to(room).emit("timerStarted", { duration });
+
+        const intervalId = setInterval(() => {
+            timeRemaining--;
+
+            if (rooms[room]) {
+                io.to(room).emit("timerUpdate", { timeRemaining });
+            }
+
+            if (timeRemaining <= 0) {
+                clearInterval(intervalId);
+
+                if (!rooms[room]) {
+                    console.error(`Room ${room} no longer exists.`);
+                    return;
+                }
+
+                const players = Object.keys(rooms[room].players).map(String);
+                const playerData = players.reduce((acc, playerId) => {
+                    const player = rooms[room].players[playerId];
+                    acc[playerId] = {
+                        score: player?.score || 0,
+                        words: player?.moves || [],
+                    };
+                    return acc;
+                }, {});
+
+                io.to(room).emit("timerEnded", { players: playerData });
+
+                console.log(`Timer ended for room ${room}. Player data:`, playerData);
+            }
+        }, 1000);
+    });
+
     socket.on("tileUpdate", (data) => {
         const { room, playerId, word, tile, isFirstTile, isLastTile, isValid, selectedColor} = data;
 
