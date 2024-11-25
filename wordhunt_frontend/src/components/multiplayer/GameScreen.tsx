@@ -69,7 +69,7 @@ const GameScreen = () => {
     }
 
     return (
-        <div className="container text-center mt-5">
+        <div>
             <SplitScreen room={room} player={playerId} board={board} />
 
             {opponentDisconnected && (
