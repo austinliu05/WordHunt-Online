@@ -16,6 +16,6 @@ const SCORING = {
     8: 2200,
 };
 
-const TIMER = 10;
+const TIMER = 90;
 
 module.exports = { BOARD_SIZE, WORD_DISTRIBUTION, SCORING, TIMER };
