@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import tutorialImage from '../assets/images/tutorial.png';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { disconnectSocket } from '../utils/websocket';
 
 const StartScreen: React.FC = () => {
     const navigate = useNavigate();
 
+    useEffect(() => {
+        disconnectSocket();
+    }, [])
+    
     const navigateToDifficulty = () => {
         navigate('/difficulty');
     };
@@ -32,9 +37,9 @@ const StartScreen: React.FC = () => {
                 <Button className='m-2' variant="primary" size="lg" onClick={navigateToDifficulty}>
                     Singleplayer
                 </Button>
-                {/* <Button className='m-2' variant="primary" size="lg" onClick={navigateToMultiplayer}>
-                    Multiplayer
-                </Button> */}
+                <Button className='m-2' variant="primary" size="lg" onClick={navigateToMultiplayer}>
+                    Multiplayer (Beta)
+                </Button>
             </div>
         </Container>
     );

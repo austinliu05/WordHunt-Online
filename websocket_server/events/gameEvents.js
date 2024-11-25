@@ -78,20 +78,6 @@ function handleGameEvents(io, socket) {
             selectedColor
         });
     });
-
-    socket.on("disconnect", () => {
-        const room = Object.keys(socket.rooms).find((r) => r.startsWith("room-") && r !== socket.id);
-        if (room && rooms[room]) {
-            delete rooms[room].players[socket.id];
-
-            if (Object.keys(rooms[room].players).length === 0) {
-                delete rooms[room];
-                console.log(`Room ${room} deleted`);
-            } else {
-                io.to(room).emit("playerDisconnected", { playerId: socket.id });
-            }
-        }
-    });
 }
 
 module.exports = { handleGameEvents };

@@ -4,8 +4,8 @@ import { SCORING, MAX_DISPLAYED_WORDS } from '../../../utils/constants';
 import { useWordContext } from '../../../context/wordContext';
 import { useGameContext } from '../../../context/gameContext';
 import ReturnHomeButton from './ReturnHomeButton';
-import WinPopup from './WinPopup';
-import LosePopup from './LosePopup';
+import WinPopup from '../../gameBoard/WinPopup';
+import LosePopup from '../../gameBoard/LosePopup';
 
 const EndScreen: React.FC = () => {
     const { words: playerWords, cpuWords: opponentWords} = useWordContext();

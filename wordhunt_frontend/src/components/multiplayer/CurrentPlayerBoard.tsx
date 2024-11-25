@@ -49,7 +49,7 @@ const CurrentPlayerBoard: React.FC<CurrentPlayerBoardProps> = ({ room, playerId,
       const newTile = { row, col, letter: board[row][col], x, y };
       setSelectedTiles([newTile]);
       setCurrentWord(board[row][col]);
-      sendTileUpdate(newTile, "start", false, null); // Passing null for initial color
+      sendTileUpdate(newTile, "start", false, null);
     }
   };
 

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import { SCORING, MAX_DISPLAYED_WORDS } from '../../../utils/constants';
+import { disconnectSocket } from '../../../utils/websocket';
 import { useLocation } from 'react-router-dom';
 import ReturnHomeButton from './ReturnHomeButton';
-import WinPopup from './WinPopup';
-import LosePopup from './LosePopup';
+import WinPopup from '../../gameBoard/WinPopup';
+import LosePopup from '../../gameBoard/LosePopup';
+import TiePopup from '../../gameBoard/TiePopup';
 
 const MultiplayerEndScreen: React.FC = () => {
     const location = useLocation();
@@ -15,15 +17,23 @@ const MultiplayerEndScreen: React.FC = () => {
 
     const [showWinPopup, setShowWinPopup] = useState<boolean>(false);
     const [showLosePopup, setShowLosePopup] = useState<boolean>(false);
-    
+    const [showTiePopup, setShowTiePopup] = useState<boolean>(false);
+
     useEffect(() => {
         if (currentPlayerData.score > opponentPlayerData.score) {
             setShowWinPopup(true);
             setShowLosePopup(false);
-        } else {
+            setShowTiePopup(false);
+        } else if (currentPlayerData.score < opponentPlayerData.score) {
             setShowWinPopup(false);
             setShowLosePopup(true);
+            setShowTiePopup(false);
+        } else {
+            setShowWinPopup(false);
+            setShowLosePopup(false);
+            setShowTiePopup(true);
         }
+        disconnectSocket();
     }, [currentPlayerData.score, opponentPlayerData.score]);
 
     const getSortedWordsWithPoints = (words: string[]) =>
@@ -43,6 +53,7 @@ const MultiplayerEndScreen: React.FC = () => {
         <Container className="d-flex flex-column align-items-center text-light mt-5 mb-5 bg-dark p-4 rounded shadow" style={{ maxWidth: '80vw' }}>
             {showWinPopup && <WinPopup />}
             {showLosePopup && <LosePopup />}
+            {showTiePopup && <TiePopup />}
             <Row className="w-100">
                 <Col xs={12} md={6} className="p-5">
                     <div className="text-center mb-4 border-bottom border-light pb-2">

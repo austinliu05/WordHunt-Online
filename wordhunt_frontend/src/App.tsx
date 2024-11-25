@@ -25,7 +25,7 @@ const App = () => {
             <Route path="/lobby" element={<GameLobby />}/>
             <Route path="/difficulty" element={<DifficultySelect/>}/>
             {isGameOver && <Route path="/end" element={<EndScreen />} />}
-            <Route path="/end" element={<MultiplayerEndScreen />} />
+            <Route path="/end-multiplayer" element={<MultiplayerEndScreen />} />
 
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>

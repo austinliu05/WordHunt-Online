@@ -25,8 +25,6 @@ const GameLobby = () => {
                 socket.on("startGame", (data: { room: string; players: string[]; board: string[][] }) => {
                     setIsLoading(true); // Show loading popup
                     setTimeout(() => {
-                        // Navigate after 3 seconds
-                        console.log(`Game started in room ${data.room}`);
                         navigate(`/game/${data.room}`, {
                             state: {
                                 room: data.room,
@@ -51,7 +49,6 @@ const GameLobby = () => {
     }, [navigate]);
 
     const goBack = () => {
-        disconnectSocket();
         navigate('/');
         goToStartScreen();
     };
@@ -70,11 +67,10 @@ const GameLobby = () => {
                         <ul className="list-group mb-4">
                             {players.map((player, index) => (
                                 <li className="list-group-item" key={index}>
-                                    Player {index + 1}: {player}
+                                    Player {index + 1} {player === getSocket()?.id && <span className="text-primary">(You)</span>}
                                 </li>
                             ))}
                         </ul>
-
                         <p className="text-muted">Waiting for another player to join...</p>
                         <button className="btn btn-danger mt-3" onClick={goBack}>
                             Leave Lobby
@@ -90,7 +86,7 @@ const GameLobby = () => {
                     style={{ backgroundColor: "rgba(0, 0, 0, 0.5)", zIndex: 1050 }}
                 >
                     <div className="p-4 bg-white rounded shadow-lg">
-                        <h4>Loading game...</h4>
+                        <h4>Player found...</h4>
                         <div className="spinner-border text-primary mt-3" role="status">
                             <span className="visually-hidden">Loading...</span>
                         </div>

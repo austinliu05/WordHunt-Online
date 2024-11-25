@@ -22,7 +22,7 @@ const Timer: React.FC = () => {
         socket.on('timerEnded', ({ players }) => {
             console.log('Timer ended');
         
-            navigate('/end', {
+            navigate('/end-multiplayer', {
                 state: {
                     players,
                     playerId: socket.id,
